@@ -1,19 +1,24 @@
-# Codex Skills
+# AI Coding Skills
 
-个人可复用的 Codex 技能包，用于换机器时一键部署到 `~/.codex/skills/`。
+个人可复用的 AI 编程技能包，包含 Codex Skills，以及面向 Claude Code 的协作编排协议。
 
 ## 快速部署
 
 ```bash
-# 克隆仓库后，将文件复制到 Codex 配置目录
 git clone <repo-url>
+
+# Codex Skills → ~/.codex/
 cp codex/AGENTS.md ~/.codex/
+cp -r codex/codex-atelier ~/.codex/skills/
 cp -r codex/skill-creator ~/.codex/skills/
 cp -r codex/taskmaster ~/.codex/skills/
 cp -r codex/todo-list-csv ~/.codex/skills/
+
+# Claude Code 协作协议可直接作为上下文使用
+# 详见 codex/codex-atelier/PROMPT.md
 ```
 
-## 包含的 Skills
+## Codex Skills
 
 ### 1. skill-creator — Skill 创建向导
 
@@ -71,12 +76,36 @@ cp -r codex/todo-list-csv ~/.codex/skills/
 
 自动化脚本 `todo_csv.py` 支持：`init`（创建）、`advance`（推进一步）、`start`（指定开始）、`plan`（生成 plan JSON）、`status`（查看进度）、`cleanup`（清理）等命令。
 
+### 4. codex-atelier — Claude Code 架构工坊协议
+
+这是一个面向 Claude Code 的协作编排 Skill，用来固定“Claude 做架构与调度，Codex 做执行、评审、验证”的分工。
+
+适用场景：
+
+- 需要先做架构简报，再把任务拆成多个 Codex 工作包
+- 中高风险任务不能只依赖单个执行结果，需要 Reviewer 或 Verifier
+- 复杂项目需要多个 Codex 并行执行，并由 Claude 统一裁决冲突
+
+核心约束：
+
+- Claude 负责目标澄清、架构拆解、任务编排、质量仲裁
+- Codex 按角色承担 `Executor`、`Reviewer`、`Verifier`、`Investigator`
+- 每个工作包都要带目标、上下文、文件边界、验证命令、完成定义
+- 交付时只汇总真实执行结果和证据，不接受伪成功或静默降级
+
+主要文件：
+
+- `SKILL.md`：说明何时触发、如何路由协作拓扑
+- `PROMPT.md`：可直接作为 Claude Code 协议文本使用
+- `references/cross-check.md`：交叉检查细则
+- `references/examples.md`：工作包样例与模板
+
 ### 对比
 
-| | taskmaster | todo-list-csv | skill-creator |
-|---|---|---|---|
-| 定位 | 重量级任务执行协议 | 轻量级 CSV 跟踪 | 元工具（创建 Skill） |
-| 适合 | 复杂长任务、自主执行 | 中等复杂度改动任务 | 封装新的可复用技能包 |
+| | taskmaster | todo-list-csv | skill-creator | codex-atelier |
+|---|---|---|---|---|
+| 定位 | 重量级任务执行协议 | 轻量级 CSV 跟踪 | 元工具（创建 Skill） | Claude Code 协作编排协议 |
+| 适合 | 复杂长任务、自主执行 | 中等复杂度改动任务 | 封装新的可复用技能包 | Claude 做架构、Codex 做执行的多代理协作 |
 
 ## 目录结构
 
@@ -85,6 +114,10 @@ skills/
 ├── README.md
 └── codex/
     ├── AGENTS.md              # 全局 Agent 规则（部署到 ~/.codex/，不是 skills/）
+    ├── codex-atelier/
+    │   ├── SKILL.md
+    │   ├── PROMPT.md
+    │   └── references/        # cross-check.md, examples.md
     ├── skill-creator/
     │   ├── SKILL.md
     │   ├── LICENSE.txt
