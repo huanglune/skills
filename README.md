@@ -8,15 +8,35 @@
 git clone <repo-url>
 
 # Codex Skills → ~/.codex/
+mkdir -p ~/.codex/skills
 cp codex/AGENTS.md ~/.codex/
-cp -r codex/codex-atelier ~/.codex/skills/
-cp -r codex/skill-creator ~/.codex/skills/
-cp -r codex/taskmaster ~/.codex/skills/
-cp -r codex/todo-list-csv ~/.codex/skills/
+bash scripts/sync_skills.sh --dry-run
+bash scripts/sync_skills.sh
 
 # Claude Code 协作协议可直接作为上下文使用
 # 详见 codex/codex-atelier/PROMPT.md
 ```
+
+`scripts/sync_skills.sh` 会自动发现 `codex/` 下所有包含 `SKILL.md` 的技能目录，并逐个同步到 `~/.codex/skills/`。它不会把 `codex/AGENTS.md` 当作 skill 同步，也不会删除你本机已有的其他无关 skills；对于同名技能目录，会用 `rsync --delete` 按仓库内容镜像更新。`--dry-run` 只预览将要执行的同步动作。
+
+## 同步脚本
+
+仓库根目录提供了 [`scripts/sync_skills.sh`](scripts/sync_skills.sh)，用于把当前仓库里的 skills 同步到本机。
+
+用法：
+
+```bash
+bash scripts/sync_skills.sh --dry-run
+bash scripts/sync_skills.sh
+```
+
+行为说明：
+
+- 自动扫描 `codex/` 下所有包含 `SKILL.md` 的目录
+- 目标路径固定为 `~/.codex/skills/`
+- 不会把 `codex/AGENTS.md` 误当作 skill 复制
+- 不会删除本机其他无关的 skills
+- 会对同名 skill 目录做镜像同步
 
 ## Codex Skills
 
@@ -112,6 +132,8 @@ cp -r codex/todo-list-csv ~/.codex/skills/
 ```text
 skills/
 ├── README.md
+├── scripts/
+│   └── sync_skills.sh         # 自动同步 codex/ 下的 skills 到 ~/.codex/skills/
 └── codex/
     ├── AGENTS.md              # 全局 Agent 规则（部署到 ~/.codex/，不是 skills/）
     ├── codex-atelier/
@@ -133,6 +155,7 @@ skills/
 ## 依赖
 
 - Python 3（辅助脚本）
+- rsync（`scripts/sync_skills.sh` 依赖）
 - [OpenAI Codex CLI](https://github.com/openai/codex)
 
 ## 配置 Codex MCP（在 Claude Code 中调用 Codex）

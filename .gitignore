@@ -21,3 +21,6 @@ pnpm-debug.log*
 # IDE
 .vscode/
 .idea/
+
+# Task artifacts
+.codex-tasks/
