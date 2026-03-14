@@ -55,6 +55,12 @@ Do not propose follow-up tasks or enhancement at the end of your final answer.
 - When running backend unit tests, enforce a hard timeout of 60 seconds to avoid stuck tasks.
 - Prefer static checks, formatting, and reproducible verification over ad-hoc manual confidence.
 
+## Python / UV
+
+- When a task involves Python, default to using `uv` for environment, dependency, tool, and Python version management.
+- Prefer `uv venv`, `uv pip`, `uv run`, `uvx`, and `uv tool` over `venv`, `pip`, `pipx`, or other ad-hoc Python environment tooling.
+- Only use another Python workflow when the user explicitly requests it, or when the project already has a clearly established alternative such as `poetry`, `pipenv`, `conda`, or a committed non-uv workflow that should be preserved.
+
 ## Skills
 
 Skills are stored in `~/.codex/skills/` (personal) and optionally `.codex/skills/` (project-shared).

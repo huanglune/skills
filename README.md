@@ -120,12 +120,35 @@ bash scripts/sync_skills.sh
 - `references/cross-check.md`：交叉检查细则
 - `references/examples.md`：工作包样例与模板
 
+### 5. uv — Python 包与环境管理
+
+这是一个围绕 `uv` / `uvx` 的 Python 开发 skill，覆盖虚拟环境、Python 版本管理、工具安装、MCP server 运行方式，以及从 `pip`、`pipx`、`poetry` 迁移到 `uv` 的常见路径。
+
+适用场景：
+
+- 需要用 `uv` 创建或管理 Python 虚拟环境
+- 需要判断 `uv tool install` 和 `uvx` 的使用边界
+- 需要用 `uvx` 运行 MCP server
+- 需要处理 Python 版本安装、固定与切换
+- 需要排查 `uv`、`uvx`、MCP 集成相关问题
+
+包含内容：
+
+- `SKILL.md`：核心概念、命令分工、常见工作流
+- `references/`：安装、工具管理、MCP 集成、Python 环境、版本变化等参考文档
+- `examples/`：虚拟环境、CI/CD、迁移、MCP 配置等实际示例
+- `docs/`：补充说明、测试与发布相关文档
+
+来源仓库：
+
+- [s2005/uv-skill](https://github.com/s2005/uv-skill)
+
 ### 对比
 
-| | taskmaster | todo-list-csv | skill-creator | codex-atelier |
-|---|---|---|---|---|
-| 定位 | 重量级任务执行协议 | 轻量级 CSV 跟踪 | 元工具（创建 Skill） | Claude Code 协作编排协议 |
-| 适合 | 复杂长任务、自主执行 | 中等复杂度改动任务 | 封装新的可复用技能包 | Claude 做架构、Codex 做执行的多代理协作 |
+| | taskmaster | todo-list-csv | skill-creator | codex-atelier | uv |
+|---|---|---|---|---|---|
+| 定位 | 重量级任务执行协议 | 轻量级 CSV 跟踪 | 元工具（创建 Skill） | Claude Code 协作编排协议 | Python 包与环境管理 skill |
+| 适合 | 复杂长任务、自主执行 | 中等复杂度改动任务 | 封装新的可复用技能包 | Claude 做架构、Codex 做执行的多代理协作 | `uv` / `uvx` / 虚拟环境 / MCP 集成问题 |
 
 ## 目录结构
 
@@ -147,6 +170,11 @@ skills/
     ├── taskmaster/
     │   ├── SKILL.md
     │   └── assets/            # 模板文件（SPEC、PROGRESS、TODO CSV、EPIC、BATCH 等）
+    ├── uv/
+    │   ├── SKILL.md
+    │   ├── references/
+    │   ├── examples/
+    │   └── docs/              # guides/, tasks/
     └── todo-list-csv/
         ├── SKILL.md
         └── scripts/           # todo_csv.py
@@ -214,3 +242,4 @@ Codex MCP 暴露两个工具：
 ## 引用
 
 - 本项目的说明结构与部分组织方式参考了 [lili-luo/aicoding-cookbook](https://github.com/lili-luo/aicoding-cookbook)
+- `uv` skill 的上游内容整理自 [s2005/uv-skill](https://github.com/s2005/uv-skill)
