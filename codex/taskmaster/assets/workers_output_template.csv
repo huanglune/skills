@@ -1,4 +1,4 @@
 id,status,summary,changed,evidence_path,error
-1,DONE,Frontmatter already valid,false,artifacts/a.json,
-2,FAILED,Missing title,false,artifacts/b.json,missing title
-3,DONE,Frontmatter fixed,true,artifacts/c.json,
+1,DONE,Frontmatter 已经有效,false,artifacts/a.json,
+2,FAILED,缺少 title,false,artifacts/b.json,缺少 title
+3,DONE,Frontmatter 已修复,true,artifacts/c.json,

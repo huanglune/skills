@@ -14,7 +14,7 @@ description: >
   DO NOT USE: single-step fixes, pure Q&A, code review, explaining code,
   search/research tasks, tasks with fewer than 3 steps, or tasks that do not
   produce file changes.
-version: 5.0.0
+version: 5.0.1
 ---
 
 # Taskmaster — v5 Task Protocol
@@ -38,13 +38,20 @@ shapes:
 5. Keep planning CSVs and batch worker CSVs separate.
 6. Build for Codex-only recovery: a cold restart must be resumable from files alone.
 
+## Language Contract
+
+- Default all human-readable generated content to Chinese unless the user explicitly requests another language.
+- Treat task artifacts as user-visible content: `SPEC.md`, `PROGRESS.md`, `EPIC.md`, `BATCH.md`, and human-readable CSV cell values must follow the user's language.
+- Keep protocol-stable identifiers in ASCII English for compatibility: file names, CSV headers, status enums, and task-shape enums remain unchanged.
+- Translate template prose and examples before writing files; do not copy English example text into generated artifacts by default.
+
 ## Shape Router
 
 | Shape | Use when | Truth artifacts | Example |
 |---|---|---|---|
-| **Single Task** | One deliverable with shared context | `TODO.csv` or `SPEC.md + TODO.csv + PROGRESS.md` | Fix one OAuth redirect bug |
-| **Epic Task** | Multiple deliverables, modules, or dependency chains | `EPIC.md + SUBTASKS.csv + PROGRESS.md` | Ship billing dashboard across API, UI, docs |
-| **Batch Task** | Same instruction template across independent rows | `TODO.csv + batch/BATCH.md + workers-input.csv + workers-output.csv` | Audit 80 Markdown files for frontmatter |
+| **Single Task** | One deliverable with shared context | `TODO.csv` or `SPEC.md + TODO.csv + PROGRESS.md` | 修复一个 OAuth 回调问题 |
+| **Epic Task** | Multiple deliverables, modules, or dependency chains | `EPIC.md + SUBTASKS.csv + PROGRESS.md` | 同时交付账单看板的 API、UI 和文档 |
+| **Batch Task** | Same instruction template across independent rows | `TODO.csv + batch/BATCH.md + workers-input.csv + workers-output.csv` | 审计 80 个 Markdown 文件的 frontmatter |
 
 ### Router Rules
 
@@ -73,9 +80,9 @@ Compact Single example:
 
 ```csv
 id,task,status,completed_at,notes
-1,Locate root cause,IN_PROGRESS,,
-2,Implement fix,TODO,,
-3,Run verification,TODO,,
+1,定位根因,IN_PROGRESS,,
+2,实现修复,TODO,,
+3,执行验证,TODO,,
 ```
 
 ### Full Single
@@ -211,9 +218,9 @@ Example Batch step sequence:
 
 ```csv
 id,task,status,acceptance_criteria,validation_command,completed_at,retry_count,notes
-1,Build workers-input.csv,IN_PROGRESS,batch/workers-input.csv exists,test -f batch/workers-input.csv,,0,
-2,Run spawn_agents_on_csv,TODO,batch/workers-output.csv exists,test -f batch/workers-output.csv,,0,
-3,Merge row results,TODO,Failed rows are handled and summary is written,test -f PROGRESS.md,,0,
+1,构建 workers-input.csv,IN_PROGRESS,batch/workers-input.csv exists,test -f batch/workers-input.csv,,0,
+2,运行 spawn_agents_on_csv,TODO,batch/workers-output.csv exists,test -f batch/workers-output.csv,,0,
+3,合并行结果,TODO,失败行已处理且摘要已写入,test -f PROGRESS.md,,0,
 ```
 
 ## Mixed Shapes

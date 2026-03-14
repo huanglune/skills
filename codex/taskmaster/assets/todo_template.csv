@@ -1,4 +1,4 @@
 id,task,status,acceptance_criteria,validation_command,completed_at,retry_count,notes
-1,Scaffold project structure,TODO,"Project dirs + config files exist","ls src/ && cat package.json",,0,
-2,Implement core module,TODO,"Core logic passes unit tests","npm test -- --grep core",,0,
-3,Add integration tests,TODO,"All integration tests pass","npm test -- --grep integration",,0,
+1,搭建项目结构,TODO,"项目目录和配置文件已存在","ls src/ && cat package.json",,0,
+2,实现核心模块,TODO,"核心逻辑通过单元测试","npm test -- --grep core",,0,
+3,补充集成测试,TODO,"所有集成测试通过","npm test -- --grep integration",,0,

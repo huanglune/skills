@@ -1,63 +1,63 @@
-# Task Specification
+# 任务说明
 
-> Scope anchor for the task. Update only when goals or constraints change, and log the reason in PROGRESS.md.
+> 这是任务范围锚点。只有在目标或约束变化时才更新，并把原因记录到 `PROGRESS.md`。
 
-## Task Shape
+## 任务形态
 <!-- single-compact | single-full | epic | batch -->
 
-- **Shape**: `<auto>`
+- **形态**: `<auto>`
 
-## Goals
-<!-- What are we building? Be specific and concrete. -->
-
--
-
-## Non-Goals
-<!-- What are we explicitly NOT doing? Prevents scope creep. -->
+## 目标
+<!-- 要交付什么？写清楚、写具体。 -->
 
 -
 
-## Constraints
-<!-- Tech stack, style guide, performance limits, compatibility requirements -->
+## 非目标
+<!-- 明确本任务不做什么，防止范围膨胀。 -->
 
 -
 
-## Environment
-<!-- Auto-filled by agent at init time -->
-
-- **Project root**: `<auto>`
-- **Language/runtime**: `<auto>`
-- **Package manager**: `<auto>`
-- **Test framework**: `<auto>`
-- **Build command**: `<auto>`
-- **Existing test count**: `<auto>`
-
-## Risk Assessment
-<!-- Identify potential blockers or unknowns before starting -->
-
-- [ ] External dependencies (APIs, services) — availability confirmed?
-- [ ] Breaking changes to existing code — impact assessed?
-- [ ] Large file generation — disk space sufficient?
-- [ ] Long-running tests — timeout configured?
-
-## Deliverables
-<!-- Concrete outputs: files, features, endpoints, docs -->
+## 约束
+<!-- 技术栈、风格规范、性能限制、兼容性要求。 -->
 
 -
 
-## Done-When
-<!-- Final acceptance criteria. The task is DONE when ALL of these pass. -->
+## 环境
+<!-- 由 agent 在初始化时自动填写。 -->
+
+- **项目根目录**: `<auto>`
+- **语言/运行时**: `<auto>`
+- **包管理器**: `<auto>`
+- **测试框架**: `<auto>`
+- **构建命令**: `<auto>`
+- **现有测试数量**: `<auto>`
+
+## 风险评估
+<!-- 开始前识别潜在阻塞项和未知因素。 -->
+
+- [ ] 外部依赖（API、服务）是否已确认可用？
+- [ ] 对现有代码的破坏性变更是否已评估影响？
+- [ ] 是否会生成大文件，磁盘空间是否充足？
+- [ ] 长时间运行的测试是否已配置超时？
+
+## 交付物
+<!-- 具体输出：文件、功能、接口、文档。 -->
+
+-
+
+## 完成条件
+<!-- 最终验收标准。只有全部通过，任务才算 DONE。 -->
 
 - [ ]
 
-## Final Validation Command
-<!-- Single command that validates the entire deliverable. Runs at close-out. -->
+## 最终验证命令
+<!-- 用一个命令验证完整交付物，在收尾时执行。 -->
 
 ```bash
-# e.g.: npm run build && npm test && npm run lint
+# 例如：npm run build && npm test && npm run lint
 ```
 
-## Demo Flow (optional)
-<!-- Step-by-step instructions to demonstrate the finished product. -->
+## 演示流程（可选）
+<!-- 用分步骤说明如何演示最终结果。 -->
 
 1.

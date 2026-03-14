@@ -1,4 +1,4 @@
 id,task,status,completed_at,notes
-1,Locate root cause,IN_PROGRESS,,
-2,Implement fix,TODO,,
-3,Run verification,TODO,,
+1,定位根因,IN_PROGRESS,,
+2,实现修复,TODO,,
+3,执行验证,TODO,,

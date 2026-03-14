@@ -1,74 +1,74 @@
-# Progress Log
+# 进度日志
 
-> Auto-maintained by Taskmaster. Each entry records what happened, why, and what's next.
-> This file serves as both decision audit trail and context-recovery anchor.
-
----
-
-## Session Start
-
-- **Date**: YYYY-MM-DD HH:MM
-- **Task name**: `<task-name>`
-- **Task dir**: `.codex-tasks/<task-name>/`
-- **Spec**: See SPEC.md
-- **Plan**: See TODO.csv (N milestones)
-- **Environment**: <language> / <framework> / <test runner>
+> 由 Taskmaster 自动维护。每条记录都说明发生了什么、为什么这样做、下一步是什么。
+> 这个文件同时承担决策审计轨迹和上下文恢复锚点的作用。
 
 ---
 
-## Context Recovery Block
+## 会话开始
 
-> If you are resuming this task after compaction, session restart, or context loss,
-> read this section FIRST to restore working state.
-
-- **Current milestone**: #N — <title>
-- **Current status**: IN_PROGRESS | WAITING_SUBTASK | WAITING_BATCH | BLOCKED_EXTERNAL | BLOCKED_SYSTEM
-- **Last completed**: #N-1 — <title>
-- **Current artifact**: `<TODO.csv | SUBTASKS.csv | batch/workers-output.csv | <path>>`
-- **Key context**: <1-2 sentences summarizing where we left off>
-- **Known issues**: <any unresolved problems>
-- **Next action**: <exact next step to take>
-
-> Update this block EVERY TIME a milestone changes status.
+- **日期**: YYYY-MM-DD HH:MM
+- **任务名**: `<task-name>`
+- **任务目录**: `.codex-tasks/<task-name>/`
+- **说明**: 见 `SPEC.md`
+- **计划**: 见 `TODO.csv`（N 个里程碑）
+- **环境**: <language> / <framework> / <test runner>
 
 ---
 
-<!-- Append entries below as each milestone completes -->
+## 上下文恢复块
 
-## Milestone N: <title>
+> 如果这是在压缩上下文、会话重启或上下文丢失后恢复任务，
+> 先读这一节来恢复工作状态。
 
-- **Status**: DONE | FAILED
-- **Started**: HH:MM
-- **Completed**: HH:MM
-- **What was done**:
+- **当前里程碑**: #N — <title>
+- **当前状态**: IN_PROGRESS | WAITING_SUBTASK | WAITING_BATCH | BLOCKED_EXTERNAL | BLOCKED_SYSTEM
+- **最近完成**: #N-1 — <title>
+- **当前工件**: `<TODO.csv | SUBTASKS.csv | batch/workers-output.csv | <path>>`
+- **关键上下文**: <用 1-2 句话总结停在哪里>
+- **已知问题**: <尚未解决的问题>
+- **下一动作**: <下一步要做的精确动作>
+
+> 每次里程碑状态变化时都要更新这一块。
+
+---
+
+<!-- 每个里程碑完成后，在下方追加记录 -->
+
+## 里程碑 N：<title>
+
+- **状态**: DONE | FAILED
+- **开始时间**: HH:MM
+- **完成时间**: HH:MM
+- **完成内容**:
   -
-- **Key decisions**:
-  - Decision: ...
-  - Reasoning: ...
-  - Alternatives considered: ...
-- **Problems encountered**:
-  - Problem: ...
-  - Resolution: ...
-  - Retry count: 0
-- **Validation**: `<command>` → exit 0 / exit 1 + error
-- **Files changed**:
-  - `path/to/file` — <what changed>
-- **Next step**: Milestone N+1 — <title>
+- **关键决策**:
+  - 决策：...
+  - 理由：...
+  - 备选方案：...
+- **遇到的问题**:
+  - 问题：...
+  - 处理：...
+  - 重试次数：0
+- **验证**: `<command>` → exit 0 / exit 1 + error
+- **变更文件**:
+  - `path/to/file` — <改了什么>
+- **下一步**: 里程碑 N+1 — <title>
 
 ---
 
-<!-- Final summary goes here when all milestones are DONE -->
+<!-- 所有里程碑都 DONE 后，在这里写最终总结 -->
 
-## Final Summary
+## 最终总结
 
-- **Total milestones**: X
-- **Completed**: X
-- **Failed + recovered**: X
-- **External unblock events**: X
-- **Total retries**: X
-- **Files created**: X
-- **Files modified**: X
-- **Key learnings**:
+- **总里程碑数**: X
+- **完成数**: X
+- **失败后恢复数**: X
+- **外部解阻事件数**: X
+- **总重试次数**: X
+- **新增文件数**: X
+- **修改文件数**: X
+- **关键结论**:
   -
-- **Recommendations for future tasks**:
+- **后续任务建议**:
   -

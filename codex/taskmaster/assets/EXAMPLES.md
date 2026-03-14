@@ -1,19 +1,19 @@
-# Taskmaster v5 Examples
+# Taskmaster v5 示例
 
-## Single Task — Compact
+## 单任务：Compact
 
-**Scenario**: rename one CLI flag across a small script set.
+**场景**：在一小组脚本里统一重命名一个 CLI flag。
 
 ```csv
 id,task,status,completed_at,notes
-1,Locate affected scripts,IN_PROGRESS,,
-2,Rename the flag,TODO,,
-3,Run smoke test,TODO,,
+1,定位受影响的脚本,IN_PROGRESS,,
+2,重命名 flag,TODO,,
+3,执行冒烟测试,TODO,,
 ```
 
-## Single Task — Full
+## 单任务：Full
 
-**Scenario**: fix one OAuth callback bug with full recovery support.
+**场景**：修复一个 OAuth 回调 bug，并保留完整恢复能力。
 
 ```text
 .codex-tasks/20260313-auth-fix/
@@ -23,9 +23,9 @@ id,task,status,completed_at,notes
 └── raw/
 ```
 
-## Epic Task
+## Epic 任务
 
-**Scenario**: ship a billing dashboard across backend, frontend, and docs.
+**场景**：同时交付账单看板的后端、前端和文档。
 
 ```text
 .codex-tasks/20260313-billing-epic/
@@ -40,14 +40,14 @@ id,task,status,completed_at,notes
 
 ```csv
 id,task,task_type,status,depends_on,task_dir,acceptance_criteria,validation_command,completed_at,retry_count,notes
-1,Implement billing API,single-full,DONE,,tasks/20260313-api,API tests pass,pytest tests/billing_api.py,2026-03-13 10:12,0,
-2,Build billing UI,single-full,IN_PROGRESS,1,tasks/20260313-frontend,UI renders invoices,npm test -- --grep billing,,0,
-3,Update billing docs,batch,TODO,1;2,tasks/20260313-docs,All docs rows succeed,python3 scripts/validate_docs.py,,0,
+1,实现账单 API,single-full,DONE,,tasks/20260313-api,API 测试通过,pytest tests/billing_api.py,2026-03-13 10:12,0,
+2,构建账单 UI,single-full,IN_PROGRESS,1,tasks/20260313-frontend,界面能正确渲染发票,npm test -- --grep billing,,0,
+3,更新账单文档,batch,TODO,1;2,tasks/20260313-docs,所有文档行都成功,python3 scripts/validate_docs.py,,0,
 ```
 
-## Batch Task
+## Batch 任务
 
-**Scenario**: audit 80 Markdown files for frontmatter consistency.
+**场景**：审计 80 个 Markdown 文件的 frontmatter 一致性。
 
 ```text
 .codex-tasks/20260313-doc-audit/
@@ -70,17 +70,17 @@ id,file_path,target_rule,notes
 
 ```csv
 id,status,summary,changed,evidence_path,error
-1,DONE,Frontmatter already valid,false,artifacts/a.json,
-2,FAILED,Missing title,false,artifacts/b.json,missing title
-3,DONE,Frontmatter fixed,true,artifacts/c.json,
+1,DONE,Frontmatter 已经有效,false,artifacts/a.json,
+2,FAILED,缺少 title,false,artifacts/b.json,missing title
+3,DONE,Frontmatter 已修复,true,artifacts/c.json,
 ```
 
-## Epic with Mixed Children (End-to-End)
+## 混合子任务的 Epic（端到端）
 
-**Scenario**: ship an i18n system — backend API (Single), frontend integration
-(Single), and batch-translate 40 locale files (Batch).
+**场景**：交付一个 i18n 系统，包括后端 API（Single）、前端集成
+（Single），以及 40 个 locale 文件的批量翻译（Batch）。
 
-### Directory layout
+### 目录结构
 
 ```text
 .codex-tasks/20260313-i18n-epic/
@@ -88,17 +88,17 @@ id,status,summary,changed,evidence_path,error
 ├── SUBTASKS.csv
 ├── PROGRESS.md
 └── tasks/
-    ├── 20260313-i18n-api/           ← single-full child
+    ├── 20260313-i18n-api/           ← single-full 子任务
     │   ├── SPEC.md
     │   ├── TODO.csv
     │   └── PROGRESS.md
-    ├── 20260313-i18n-frontend/      ← single-full child
+    ├── 20260313-i18n-frontend/      ← single-full 子任务
     │   ├── SPEC.md
     │   ├── TODO.csv
     │   └── PROGRESS.md
-    └── 20260313-i18n-translate/     ← batch child
+    └── 20260313-i18n-translate/     ← batch 子任务
         ├── SPEC.md
-        ├── TODO.csv                 ← 3-step batch plan
+        ├── TODO.csv                 ← 3 步 Batch 计划
         ├── PROGRESS.md
         └── batch/
             ├── BATCH.md
@@ -110,21 +110,21 @@ id,status,summary,changed,evidence_path,error
 
 ```csv
 id,task,task_type,status,depends_on,task_dir,acceptance_criteria,validation_command,completed_at,retry_count,notes
-1,Build i18n API,single-full,DONE,,tasks/20260313-i18n-api,API returns translated strings,pytest tests/i18n_api.py,2026-03-13 09:40,0,
-2,Integrate i18n in frontend,single-full,IN_PROGRESS,1,tasks/20260313-i18n-frontend,UI renders in selected locale,npm test -- --grep i18n,,0,
-3,Batch-translate 40 locale files,batch,TODO,1,tasks/20260313-i18n-translate,All locale rows pass,test -f tasks/20260313-i18n-translate/batch/workers-output.csv,,0,
+1,实现 i18n API,single-full,DONE,,tasks/20260313-i18n-api,API 能返回翻译后的文案,pytest tests/i18n_api.py,2026-03-13 09:40,0,
+2,在前端集成 i18n,single-full,IN_PROGRESS,1,tasks/20260313-i18n-frontend,界面能按所选语言渲染,npm test -- --grep i18n,,0,
+3,批量翻译 40 个 locale 文件,batch,TODO,1,tasks/20260313-i18n-translate,所有 locale 行都通过,test -f tasks/20260313-i18n-translate/batch/workers-output.csv,,0,
 ```
 
-### Batch child TODO.csv (tasks/20260313-i18n-translate/)
+### Batch 子任务 TODO.csv（tasks/20260313-i18n-translate/）
 
 ```csv
 id,task,status,acceptance_criteria,validation_command,completed_at,retry_count,notes
-1,Build workers-input.csv from locales/,TODO,batch/workers-input.csv exists,test -f batch/workers-input.csv,,0,
-2,Run spawn_agents_on_csv,TODO,batch/workers-output.csv exists,test -f batch/workers-output.csv,,0,
-3,Merge results and handle failures,TODO,All rows pass or are accepted,grep -c FAILED batch/workers-output.csv | grep -q ^0$,,0,
+1,从 locales/ 构建 workers-input.csv,TODO,batch/workers-input.csv exists,test -f batch/workers-input.csv,,0,
+2,运行 spawn_agents_on_csv,TODO,batch/workers-output.csv exists,test -f batch/workers-output.csv,,0,
+3,合并结果并处理失败项,TODO,所有行都通过或被接受,grep -c FAILED batch/workers-output.csv | grep -q ^0$,,0,
 ```
 
-### Batch child workers-input.csv
+### Batch 子任务 workers-input.csv
 
 ```csv
 id,file_path,source_lang,target_lang
@@ -135,16 +135,15 @@ id,file_path,source_lang,target_lang
 40,locales/en.json,en,pt
 ```
 
-### Batch child workers-output.csv (after run)
+### Batch 子任务 workers-output.csv（运行后）
 
 ```csv
 id,status,summary,changed,evidence_path,error
-1,DONE,Translated 182 keys,true,artifacts/zh.json,
-2,DONE,Translated 182 keys,true,artifacts/ja.json,
-3,FAILED,3 keys untranslatable,false,artifacts/ko.json,keys: date_fmt; plural_rule; honorific
+1,DONE,已翻译 182 个键,true,artifacts/zh.json,
+2,DONE,已翻译 182 个键,true,artifacts/ja.json,
+3,FAILED,有 3 个键无法翻译,false,artifacts/ko.json,keys: date_fmt; plural_rule; honorific
 ```
 
-In this example, the Epic parent waits for child tasks 1-3 to all reach `DONE`.
-Child 3 (Batch) internally retries failed rows via `workers-input-retry.csv`
-before escalating.
-
+在这个例子里，Epic 父任务会等待 1-3 号子任务全部到达 `DONE`。
+3 号子任务（Batch）会先通过 `workers-input-retry.csv` 内部重试失败行，
+再决定是否向上升级处理。

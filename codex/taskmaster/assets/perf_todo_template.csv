@@ -1,4 +1,4 @@
 id,task,status,acceptance_criteria,validation_command,completed_at,retry_count,notes,metric_name,target,actual,evidence_path
-1,Capture baseline metrics,TODO,"Baseline metrics recorded and checked","test -f artifacts/baseline-latency.txt",,0,,p95_latency_ms,<=250,,artifacts/baseline-latency.txt
-2,Reduce hot-path latency,TODO,"Optimized metrics meet latency target","test -f artifacts/optimized-latency.txt",,0,,p95_latency_ms,<=200,,artifacts/optimized-latency.txt
-3,Verify load stability,TODO,"Load report shows stable error rate","test -f artifacts/load-test-report.txt",,0,,error_rate_pct,<=1,,artifacts/load-test-report.txt
+1,采集基线指标,TODO,"基线指标已记录并检查","test -f artifacts/baseline-latency.txt",,0,,p95_latency_ms,<=250,,artifacts/baseline-latency.txt
+2,降低热点路径延迟,TODO,"优化后的指标达到延迟目标","test -f artifacts/optimized-latency.txt",,0,,p95_latency_ms,<=200,,artifacts/optimized-latency.txt
+3,验证负载稳定性,TODO,"负载报告显示错误率稳定","test -f artifacts/load-test-report.txt",,0,,error_rate_pct,<=1,,artifacts/load-test-report.txt

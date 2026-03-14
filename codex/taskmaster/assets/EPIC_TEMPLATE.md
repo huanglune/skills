@@ -1,50 +1,50 @@
-# Epic Specification
+# Epic 任务说明
 
-> Parent coordination file for multi-deliverable work. Use when one `TODO.csv`
-> would otherwise carry phases, subprojects, or dependency chains.
+> 这是多交付物工作的父级协调文件。
+> 当单个 `TODO.csv` 开始承载阶段、子项目或依赖链时使用。
 
-## Goal
+## 总目标
 
-- <overall delivery goal>
+- <整体交付目标>
 
-## Non-Goals
+## 非目标
 
-- <what the epic does not cover>
+- <Epic 不覆盖的内容>
 
-## Constraints
+## 约束
 
-- <tech stack requirements, e.g., must use Python 3.12+>
-- <style requirements, e.g., follow existing linting config>
-- <resource limits, e.g., no new external dependencies>
+- <技术栈要求，例如必须使用 Python 3.12+>
+- <风格要求，例如遵循现有 lint 配置>
+- <资源限制，例如不能新增外部依赖>
 
-## Risk Assessment
+## 风险评估
 
-- <external dependency risks, e.g., third-party API availability>
-- <breaking change risks, e.g., database schema migration>
-- <performance risks, e.g., large dataset processing>
+- <外部依赖风险，例如第三方 API 可用性>
+- <破坏性变更风险，例如数据库 schema 迁移>
+- <性能风险，例如大数据集处理>
 
-## Child Deliverables
+## 子任务交付物
 
-- <child task 1>
-- <child task 2>
+- <子任务 1>
+- <子任务 2>
 
-## Dependency Notes
+## 依赖说明
 
-- <child 2 depends on child 1>
-- `depends_on` uses `;` as delimiter for multiple IDs (e.g., `1;2`)
+- <子任务 2 依赖子任务 1>
+- `depends_on` 使用 `;` 分隔多个 ID（例如 `1;2`）
 
-## Child Task Types
+## 子任务类型
 
 - `single-compact`
 - `single-full`
 - `batch`
 
-## Done-When
+## 完成条件
 
-- [ ] Every row in `SUBTASKS.csv` is `DONE`
-- [ ] Final epic validation passes
+- [ ] `SUBTASKS.csv` 中每一行都为 `DONE`
+- [ ] Epic 的最终验证通过
 
-## Example Layout
+## 目录示例
 
 ```text
 .codex-tasks/20260313-billing-epic/

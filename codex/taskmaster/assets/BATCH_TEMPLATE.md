@@ -1,22 +1,21 @@
-# Batch Configuration
+# Batch 配置
 
-> Configuration file for homogeneous row-level work executed through
-> `spawn_agents_on_csv`.
+> 这是通过 `spawn_agents_on_csv` 执行同构行级任务时使用的配置文件。
 
-## Batch Goal
+## Batch 目标
 
-- <what every row is trying to accomplish>
+- <每一行都要完成什么>
 
-## Why This Is Batchable
+## 为什么适合 Batch
 
-- Same instruction template applies to every row
-- Rows are independent
-- Output is structured and schema-friendly
+- 同一个指令模板可以描述每一行
+- 每一行彼此独立
+- 输出可以结构化表达并匹配 schema
 
-## Instruction Template
+## 指令模板
 
 ```text
-Read {file_path}, apply {target_rule}, and report:
+读取 {file_path}，应用 {target_rule}，并报告：
 - status
 - summary
 - changed
@@ -24,7 +23,7 @@ Read {file_path}, apply {target_rule}, and report:
 - error
 ```
 
-## Execution Settings
+## 执行设置
 
 - **id_column**: `id`
 - **output_schema**: `{ "status": "string", "summary": "string", "changed": "boolean", "evidence_path": "string", "error": "string" }`
@@ -32,26 +31,26 @@ Read {file_path}, apply {target_rule}, and report:
 - **max_runtime_seconds**: `<seconds>`
 - **output_csv_path**: `batch/workers-output.csv`
 
-## Retry Strategy
+## 重试策略
 
-- After the initial run, filter failed rows from `workers-output.csv` into `batch/workers-input-retry.csv`.
-- Re-run `spawn_agents_on_csv` with `csv_path="batch/workers-input-retry.csv"` and append results back into `workers-output.csv`.
-- Maximum **3 batch retries**. If rows still fail after 3 rounds, mark them as `FAILED` with notes and escalate to the parent task for manual resolution.
-- Each retry round must be logged in `PROGRESS.md` with the count of remaining failed rows.
+- 首轮执行后，把 `workers-output.csv` 中失败的行筛到 `batch/workers-input-retry.csv`。
+- 用 `csv_path="batch/workers-input-retry.csv"` 重新执行 `spawn_agents_on_csv`，并把结果追加回 `workers-output.csv`。
+- 最多进行 **3 次 Batch 重试**。如果 3 轮后仍失败，就把这些行标记为 `FAILED` 并写明备注，再上报父任务做人工处理。
+- 每一轮重试都必须在 `PROGRESS.md` 里记录，还要写清剩余失败行数量。
 
-## Merge Strategy
+## 合并策略
 
-- Parent task stays `IN_PROGRESS` until all rows pass or are explicitly accepted as `FAILED`.
-- Failed rows remain visible in `workers-output.csv` — never delete or hide them.
-- After final retry, write a summary block to `PROGRESS.md`: total rows, passed, failed, accepted-as-failed.
+- 在所有行通过，或被显式接受为 `FAILED` 之前，父任务都保持 `IN_PROGRESS`。
+- 失败行必须保留在 `workers-output.csv` 中，不能删除或隐藏。
+- 最终重试结束后，要把总结写进 `PROGRESS.md`：总行数、通过数、失败数、接受为失败的数量。
 
-## Example Invocation Shape
+## 调用形态示例
 
 ```text
 spawn_agents_on_csv(
   csv_path="batch/workers-input.csv",
   id_column="id",
-  instruction="Read {file_path} ...",
+  instruction="读取 {file_path} ...",
   output_schema={...},
   max_workers=8,
   max_runtime_seconds=600,
