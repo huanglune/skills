@@ -154,3 +154,7 @@ Codex MCP 暴露两个工具：
 |------|------|
 | `codex` | 启动新的 Codex 会话 |
 | `codex-reply` | 继续已有的 Codex 会话 |
+
+## 引用
+
+- 本项目的说明结构与部分组织方式参考了 [lili-luo/aicoding-cookbook](https://github.com/lili-luo/aicoding-cookbook)
