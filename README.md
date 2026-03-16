@@ -7,17 +7,17 @@
 ```bash
 git clone <repo-url>
 
-# Codex Skills → ~/.codex/
-mkdir -p ~/.codex/skills
+# Codex Skills → ~/.codex/skills，Claude Skills → ~/.claude/skills
+mkdir -p ~/.codex/skills ~/.claude/skills
 cp codex/AGENTS.md ~/.codex/
 bash scripts/sync_skills.sh --dry-run
 bash scripts/sync_skills.sh
 
 # Claude Code 协作协议可直接作为上下文使用
-# 详见 codex/codex-atelier/PROMPT.md
+# 详见 claude/codex-atelier/PROMPT.md
 ```
 
-`scripts/sync_skills.sh` 会自动发现 `codex/` 下所有包含 `SKILL.md` 的技能目录，并逐个同步到 `~/.codex/skills/`。它不会把 `codex/AGENTS.md` 当作 skill 同步，也不会删除你本机已有的其他无关 skills；对于同名技能目录，会用 `rsync --delete` 按仓库内容镜像更新。`--dry-run` 只预览将要执行的同步动作。
+`scripts/sync_skills.sh` 会自动发现 `codex/` 与 `claude/` 下所有包含 `SKILL.md` 的技能目录，并分别同步到 `~/.codex/skills/` 与 `~/.claude/skills/`。它不会把 `codex/AGENTS.md` 当作 skill 同步，也不会删除你本机已有的其他无关 skills；对于同名技能目录，会用 `rsync --delete` 按仓库内容镜像更新。`--dry-run` 只预览将要执行的同步动作。
 
 ## 同步脚本
 
@@ -32,13 +32,13 @@ bash scripts/sync_skills.sh
 
 行为说明：
 
-- 自动扫描 `codex/` 下所有包含 `SKILL.md` 的目录
-- 目标路径固定为 `~/.codex/skills/`
+- 自动扫描 `codex/` 与 `claude/` 下所有包含 `SKILL.md` 的目录
+- `codex/` 同步到 `~/.codex/skills/`，`claude/` 同步到 `~/.claude/skills/`
 - 不会把 `codex/AGENTS.md` 误当作 skill 复制
 - 不会删除本机其他无关的 skills
 - 会对同名 skill 目录做镜像同步
 
-## Codex Skills
+## Skills
 
 ### 1. skill-creator — Skill 创建向导
 
@@ -98,7 +98,7 @@ bash scripts/sync_skills.sh
 
 ### 4. codex-atelier — Claude Code 架构工坊协议
 
-这是一个面向 Claude Code 的协作编排 Skill，用来固定“Claude 做架构与调度，Codex 做执行、评审、验证”的分工。
+这是一个面向 Claude Code 的协作编排 Skill，仓库路径为 `claude/codex-atelier/`，用来固定“Claude 做架构与调度，Codex 做执行、评审、验证”的分工。
 
 适用场景：
 
@@ -157,28 +157,29 @@ bash scripts/sync_skills.sh
 skills/
 ├── README.md
 ├── scripts/
-│   └── sync_skills.sh         # 自动同步 codex/ 下的 skills 到 ~/.codex/skills/
-└── codex/
-    ├── AGENTS.md              # 全局 Agent 规则（部署到 ~/.codex/，不是 skills/）
-    ├── codex-atelier/
-    │   ├── SKILL.md
-    │   ├── PROMPT.md
-    │   └── references/        # cross-check.md, examples.md
-    ├── skill-creator/
-    │   ├── SKILL.md
-    │   ├── LICENSE.txt
-    │   └── scripts/           # init_skill.py, package_skill.py, quick_validate.py
-    ├── taskmaster/
-    │   ├── SKILL.md
-    │   └── assets/            # 模板文件（SPEC、PROGRESS、TODO CSV、EPIC、BATCH 等）
-    ├── uv/
-    │   ├── SKILL.md
-    │   ├── references/
-    │   ├── examples/
-    │   └── docs/              # guides/, tasks/
-    └── todo-list-csv/
+│   └── sync_skills.sh         # 自动同步 codex/ -> ~/.codex/skills/，claude/ -> ~/.claude/skills/
+├── codex/
+│   ├── AGENTS.md              # 全局 Agent 规则（部署到 ~/.codex/，不是 skills/）
+│   ├── skill-creator/
+│   │   ├── SKILL.md
+│   │   ├── LICENSE.txt
+│   │   └── scripts/           # init_skill.py, package_skill.py, quick_validate.py
+│   ├── taskmaster/
+│   │   ├── SKILL.md
+│   │   └── assets/            # 模板文件（SPEC、PROGRESS、TODO CSV、EPIC、BATCH 等）
+│   ├── uv/
+│   │   ├── SKILL.md
+│   │   ├── references/
+│   │   ├── examples/
+│   │   └── docs/              # guides/, tasks/
+│   └── todo-list-csv/
+│       ├── SKILL.md
+│       └── scripts/           # todo_csv.py
+└── claude/
+    └── codex-atelier/
         ├── SKILL.md
-        └── scripts/           # todo_csv.py
+        ├── PROMPT.md
+        └── references/        # cross-check.md, examples.md, output-schema.json
 ```
 
 ## 依赖
