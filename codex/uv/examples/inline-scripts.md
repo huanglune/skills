@@ -34,8 +34,8 @@ if __name__ == "__main__":
 # UV automatically installs dependencies and runs the script
 uv run script.py
 
-# Or with uvx
-uvx script.py
+# Prefer uv run for script execution
+uv run script.py
 ```
 
 ## With Python Version Requirement

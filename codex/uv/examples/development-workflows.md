@@ -43,10 +43,10 @@ coverage report
 # │   └── deploy.py
 # └── pyproject.toml
 
-# Run scripts without installing globally
-uvx --from . scripts/setup_database.py
-uvx --from . scripts/generate_docs.py --format html
-uvx --from . scripts/deploy.py --environment production
+# Run project scripts inside the project environment
+uv run python scripts/setup_database.py
+uv run python scripts/generate_docs.py --format html
+uv run python scripts/deploy.py --environment production
 ```
 
 ## Multi-Version Testing
@@ -57,15 +57,15 @@ uv python install 3.10 3.11 3.12
 
 # Test with Python 3.10
 uv python pin 3.10
-uvx --from . tests/run_tests.py
+uv run python tests/run_tests.py
 
 # Test with Python 3.11
 uv python pin 3.11
-uvx --from . tests/run_tests.py
+uv run python tests/run_tests.py
 
 # Test with Python 3.12
 uv python pin 3.12
-uvx --from . tests/run_tests.py
+uv run python tests/run_tests.py
 
 # Compare results
 diff <(uv run --python 3.10 tests/test.py) \

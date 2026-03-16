@@ -2,13 +2,15 @@
 
 ## Overview
 
-Complete MCP server configuration examples for various platforms and use cases.
+Use these examples as current uv-oriented MCP patterns:
+
+- published package server: `uvx`
+- local project server: `uv run`
+- checked-in config: no floating latest specifier
 
 ## Published MCP Servers
 
-### Official MCP Servers Repository
-
-From: `github.com/modelcontextprotocol/servers`
+### Model Context Protocol Servers
 
 ```json
 {
@@ -37,84 +39,30 @@ From: `github.com/modelcontextprotocol/servers`
 }
 ```
 
-### AWS MCP Servers
-
-From: `github.com/awslabs/mcp`
+### Published Packages That Should Be Pinned In Shared Config
 
 ```json
 {
   "mcpServers": {
     "core": {
       "command": "uvx",
-      "args": ["awslabs.core-mcp-server@latest"],
+      "args": ["awslabs.core-mcp-server@1.0.0"],
       "env": {
         "FASTMCP_LOG_LEVEL": "ERROR"
       }
     },
     "lambda": {
       "command": "uvx",
-      "args": ["awslabs.lambda-mcp-server@latest"],
+      "args": ["awslabs.lambda-mcp-server@1.0.0"],
       "env": {
         "AWS_REGION": "us-east-1"
       }
-    },
-    "bedrock": {
-      "command": "uvx",
-      "args": ["awslabs.bedrock-mcp-server@latest"],
-      "env": {
-        "AWS_PROFILE": "default"
-      }
-    },
-    "nova-canvas": {
-      "command": "uvx",
-      "args": ["awslabs.nova-canvas-mcp-server@latest"]
     }
   }
 }
 ```
 
-### VS Code MCP Documentation
-
-From: `code.visualstudio.com/docs/copilot/chat/mcp-servers`
-
-```json
-{
-  "servers": {
-    "fetch": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": ["mcp-server-fetch"]
-    }
-  }
-}
-```
-
-### Continue IDE
-
-From: Continue IDE Documentation
-
-```json
-{
-  "experimental": {
-    "modelContextProtocolServers": [
-      {
-        "transport": {
-          "type": "stdio",
-          "command": "uvx",
-          "args": ["mcp-server-sqlite", "--db-path", "/Users/NAME/test.db"]
-        }
-      },
-      {
-        "transport": {
-          "type": "stdio",
-          "command": "uvx",
-          "args": ["mcp-server-fetch"]
-        }
-      }
-    ]
-  }
-}
-```
+Replace the example version with the exact version that has actually been tested in your environment.
 
 ## Local MCP Server Development
 
@@ -123,38 +71,37 @@ From: Continue IDE Documentation
 ```json
 {
   "mcpServers": {
-    "sql-plugins": {
+    "local-server": {
       "type": "stdio",
-      "command": "uvx",
+      "command": "uv",
       "args": [
-        "--from", "d:/mcp/my.python/sqlplugins",
+        "run",
+        "--directory",
+        "d:/mcp/my.python/sqlplugins",
+        "python",
         "mcp_server.py",
-        "--env", "d:/mcp/my.python/sqlplugins/hr2.env"
+        "--env",
+        "d:/mcp/my.python/sqlplugins/hr2.env"
       ]
     }
   }
 }
 ```
 
-### Development with Multiple Configurations
+### Development and Packaged Variants
 
 ```json
 {
   "mcpServers": {
     "dev-server": {
-      "command": "uvx",
+      "command": "uv",
       "args": [
-        "--from", "${workspaceFolder}",
+        "run",
+        "--directory",
+        "${workspaceFolder}",
+        "python",
         "src/server.py",
         "--debug"
-      ]
-    },
-    "test-server": {
-      "command": "uvx",
-      "args": [
-        "--from", "${workspaceFolder}",
-        "src/server.py",
-        "--config", "test_config.json"
       ]
     },
     "prod-server": {

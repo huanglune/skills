@@ -122,22 +122,23 @@ bash scripts/sync_skills.sh
 
 ### 5. uv — Python 包与环境管理
 
-这是一个围绕 `uv` / `uvx` 的 Python 开发 skill，覆盖虚拟环境、Python 版本管理、工具安装、MCP server 运行方式，以及从 `pip`、`pipx`、`poetry` 迁移到 `uv` 的常见路径。
+这是一个以 `uv 0.10.10` 为当前基线的 Python 开发 skill，默认推荐项目优先工作流 `uv init` / `uv add` / `uv sync` / `uv run`，并明确区分 `uv tool install`、`uv tool run` / `uvx`、`uv pip` 三类路径的使用边界。
 
 适用场景：
 
-- 需要用 `uv` 创建或管理 Python 虚拟环境
-- 需要判断 `uv tool install` 和 `uvx` 的使用边界
-- 需要用 `uvx` 运行 MCP server
-- 需要处理 Python 版本安装、固定与切换
-- 需要排查 `uv`、`uvx`、MCP 集成相关问题
+- 需要创建或维护基于 `pyproject.toml` 的 `uv` 项目
+- 需要判断 `uv tool install`、`uv tool run` / `uvx`、`uv run` 的职责边界
+- 需要运行 MCP server，并区分“发布包用 `uvx`，本地项目代码用 `uv run`”
+- 需要处理 Python 版本安装、固定、升级、shell 集成
+- 需要从 `pip`、`pipx`、`poetry`、`pyenv` 迁移到 `uv`
+- 需要在 `requirements.txt` 环境下使用 `uv venv` + `uv pip` 兼容模式
 
 包含内容：
 
-- `SKILL.md`：核心概念、命令分工、常见工作流
-- `references/`：安装、工具管理、MCP 集成、Python 环境、版本变化等参考文档
-- `examples/`：虚拟环境、CI/CD、迁移、MCP 配置等实际示例
-- `docs/`：补充说明、测试与发布相关文档
+- `SKILL.md`：当前基线、默认决策表、项目工作流与命令分工
+- `references/`：安装与初始化、工具管理、Python 运行时、MCP 集成、版本变更等参考文档
+- `examples/`：本地脚本、MCP 配置、迁移、CI/CD 等示例
+- `docs/`：skill 测试与发布相关文档
 
 来源仓库：
 
@@ -148,7 +149,7 @@ bash scripts/sync_skills.sh
 | | taskmaster | todo-list-csv | skill-creator | codex-atelier | uv |
 |---|---|---|---|---|---|
 | 定位 | 重量级任务执行协议 | 轻量级 CSV 跟踪 | 元工具（创建 Skill） | Claude Code 协作编排协议 | Python 包与环境管理 skill |
-| 适合 | 复杂长任务、自主执行 | 中等复杂度改动任务 | 封装新的可复用技能包 | Claude 做架构、Codex 做执行的多代理协作 | `uv` / `uvx` / 虚拟环境 / MCP 集成问题 |
+| 适合 | 复杂长任务、自主执行 | 中等复杂度改动任务 | 封装新的可复用技能包 | Claude 做架构、Codex 做执行的多代理协作 | `uv` 项目工作流、`uv tool` / `uvx`、Python 运行时、MCP 集成、兼容模式迁移 |
 
 ## 目录结构
 

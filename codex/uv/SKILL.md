@@ -1,272 +1,187 @@
 ---
 name: uv
-description: This skill should be used when the user asks about UV (Python package manager), needs to set up Python virtual environments, install/manage Python CLI tools, run MCP servers with UVX, decide between uv tool install vs uvx, configure VS Code or IDEs for MCP server integration, migrate from pip/pipx/poetry to UV, or troubleshoot UV-related issues. Use when queries mention UV, UVX, Python package management, virtual environments, MCP servers, tool installation, or Python version management.
+description: This skill should be used when the user asks about UV (Astral's Python package manager), modern uv project workflows (`uv init` / `uv add` / `uv sync` / `uv run`), the `uv tool` / `uvx` distinction, Python runtime management, inline script metadata, MCP server execution with uv, or migration from pip, pipx, poetry, or pyenv. Use when queries mention UV, UVX, Python package management, virtual environments, Python versions, CLI tools, or MCP servers.
 ---
 
 # UV - Python Package Manager Skill
 
 ## Overview
 
-UV is an extremely fast Python package and project manager written in Rust. This skill provides guidance on using UV for Python development, with particular focus on MCP (Model Context Protocol) server integration and modern tool management workflows.
+Treat this skill as the current operational guide for **uv 0.10.10**.
 
-UV replaces multiple tools: pip, pip-tools, pipx, poetry, pyenv, twine, virtualenv, and more - delivering 10-100x faster performance through intelligent caching and parallel operations.
-
-## Version Awareness
-
-**Recommended Version: UV 0.9.7+** (Latest as of October 2025)
-
-Before starting, check your UV version:
+Start every version-sensitive task with:
 
 ```bash
 uv --version
 ```
 
-**Important Version-Specific Changes:**
+Use the current official docs and releases as the source of truth:
 
-- **UV 0.9.6+**: Python 3.14 is now the default (previously 3.13)
-- **UV 0.9.6+**: Free-threaded Python 3.14+ supported without explicit opt-in
-- **UV 0.9.6+**: `uv build --clear` flag available for cleaning build artifacts
-- **UV 0.9.7+**: Security updates for tar/ZIP archive handling
+- Docs: `https://docs.astral.sh/uv/`
+- Releases: `https://github.com/astral-sh/uv/releases`
 
-If your version is older than 0.9.0, upgrade for the best experience:
+## Current Baseline
 
-```bash
-# Using pip
-pip install --upgrade uv
+- Assume **uv 0.10.10** unless the user's machine reports another version.
+- Prefer the **project workflow** for modern repos: `uv init`, `uv add`, `uv sync`, `uv run`.
+- Treat **`uvx` as an alias of `uv tool run`**, not as a separate execution model.
+- Use **`uv tool install`** for persistent CLI applications.
+- Use **`uv run`** for local project commands and single-file scripts.
+- Reserve **`uv pip`** for pip-compatible or `requirements.txt`-driven environments.
+- Avoid floating latest specifiers in checked-in configs, CI, IDE settings, and reproducible automation.
 
-# Or reinstall using official installer
-# Windows
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+## When To Use This Skill
 
-# Unix/Mac
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+Use this skill when the task involves:
 
-See [Recent Changes Reference](references/recent-changes.md) for detailed version information and migration guidance.
+- Creating or maintaining a uv-managed Python project
+- Choosing between `uv run`, `uv tool install`, `uv tool run`, and `uv pip`
+- Installing or pinning Python runtimes with `uv python ...`
+- Running or packaging single-file scripts with inline metadata
+- Configuring MCP servers through `uvx` / `uv tool run`
+- Migrating from `pip`, `pipx`, `poetry`, `pyenv`, or ad-hoc virtualenv workflows
 
-## When to Use This Skill
+Skip this skill when the task is unrelated to Python tooling or package management.
 
-Use this skill when:
+## Default Decision Table
 
-- Setting up Python virtual environments and managing Python versions
-- Installing and managing Python CLI tools (development tools, utilities)
-- Running MCP servers with UVX
-- Deciding between `uv tool install` vs `uvx` for package execution
-- Configuring VS Code or other IDEs for MCP server integration
-- Migrating from pip, pipx, or poetry to UV
-- Troubleshooting UV-related issues
+| Need | Prefer | Notes |
+| --- | --- | --- |
+| Create or work on a normal Python project | `uv init`, `uv add`, `uv sync`, `uv run` | Default path for `pyproject.toml` projects |
+| Run a command inside a uv-managed project | `uv run ...` | Uses the project environment |
+| Install a CLI tool for repeated daily use | `uv tool install ...` | Persistent isolated installation |
+| Run a CLI tool once or test a version | `uv tool run ...` or `uvx ...` | `uvx` is just the alias |
+| Run a local script | `uv run script.py` or `uv run python script.py` | Prefer project/script flow over `uvx` |
+| Manage Python runtimes | `uv python ...` | Install, pin, find, upgrade, update shell |
+| Work in a legacy `requirements.txt` environment | `uv venv` + `uv pip ...` | Compatibility mode, not the default |
 
-Skip this skill when:
+## Recommended Workflows
 
-- You need basic Python package installation only (standard pip documentation may suffice)
-- Working with legacy Python 2.x projects
+### 1. Modern Project Workflow
 
-## Core Concepts
-
-### 1. UV Commands Overview
-
-UV provides several commands for different use cases:
-
-| Command | Purpose | Example |
-|---------|---------|---------|
-| `uv pip install` | Install packages in current environment | `uv pip install requests` |
-| `uv tool install` | Install CLI tools globally with isolation | `uv tool install black` |
-| `uvx` | Execute packages in temporary environments | `uvx mcp-server-sqlite` |
-| `uv venv` | Create virtual environments | `uv venv .venv` |
-| `uv python install` | Install Python versions | `uv python install 3.12` |
-
-### 2. Tool vs UVX Decision Tree
-
-```text
-Need to run a Python package?
-|
-├─ Use daily/frequently?
-|  └─ YES → `uv tool install package`
-|     Examples: black, pytest, flake8, mypy
-|
-├─ MCP server?
-|  └─ YES → `uvx package` or `uvx --from path script.py`
-|     Examples: mcp-server-sqlite, custom MCP servers
-|
-├─ Testing/one-off execution?
-|  └─ YES → `uvx package`
-|     Examples: testing new tools, version comparison
-|
-└─ Local development script?
-   └─ YES → `uvx --from . script.py`
-      Examples: project-specific scripts
-```
-
-### 3. MCP Server Execution Patterns
-
-**Published Packages (No working directory needed):**
-
-```json
-{
-  "servers": {
-    "sqlite": {
-      "command": "uvx",
-      "args": ["mcp-server-sqlite", "--db-path", "/path/to/db"]
-    }
-  }
-}
-```
-
-**Local Development (Use --from flag):**
-
-```json
-{
-  "servers": {
-    "my-server": {
-      "command": "uvx",
-      "args": [
-        "--from", "/absolute/path/to/project",
-        "server.py",
-        "--config", "config.json"
-      ]
-    }
-  }
-}
-```
-
-**Key insight**: `--from` flag IS the working directory reference for UVX.
-
-### 4. Virtual Environment Management
-
-UV works seamlessly with Python's built-in venv:
+Prefer uv's project commands when the repository uses or can use `pyproject.toml`.
 
 ```bash
-# Create virtual environment
-python -m venv .venv
-
-# Activate (Windows Git Bash)
-. .venv/Scripts/activate
-
-# Activate (Windows CMD)
-.venv\Scripts\activate.bat
-
-# Activate (Linux/Mac)
-source .venv/bin/activate
-
-# Install packages with UV
-uv pip install -r requirements.txt
-```
-
-## Common Workflows
-
-### Development Tools Setup
-
-```bash
-# Install development tools once
-uv tool install black
-uv tool install flake8
-uv tool install mypy
-uv tool install pytest
-
-# Use daily
-black .
-flake8 src/
-mypy src/
-pytest tests/
-```
-
-### MCP Server Usage
-
-```bash
-# Test published MCP servers
-uvx mcp-server-sqlite --db-path test.db
-uvx mcp-server-git --repository /path/to/repo
-
-# Local MCP server development
-uvx --from /path/to/project server.py --env config.env
-```
-
-### Project Initialization
-
-```bash
-# Create new project with UV
-uv init my-project
-cd my-project
+# Create a new project
+uv init example-app
+cd example-app
 
 # Add dependencies
-uv add requests fastapi
+uv add fastapi ruff pytest
 
-# Run project
-uv run python main.py
+# Sync the environment from project metadata
+uv sync
+
+# Run commands inside the project environment
+uv run python -m example_app
+uv run pytest
+uv run ruff check .
 ```
 
-### Python Version Management
+Use `uv sync` as the default entry point when the repo already contains `pyproject.toml` and optionally `uv.lock`.
+
+### 2. Tool Management
+
+Install tools permanently when they are used frequently:
 
 ```bash
-# List available Python versions
-uv python list
-
-# Install default Python version (3.14 in UV 0.9.6+)
-uv python install
-
-# Install specific Python version
-uv python install 3.12
-uv python install 3.13
-
-# Use in project
-uv python pin 3.12
+uv tool install ruff
+uv tool install basedpyright
+uv tool install pre-commit
+uv tool update-shell
 ```
 
-**Note:** As of UV 0.9.6, Python 3.14 is the default version. If you need Python 3.13 or earlier, explicitly specify the version.
-
-### Inline Script Dependencies (PEP 723)
-
-UV supports defining dependencies directly in Python script comments:
-
-```python
-# /// script
-# dependencies = [
-#   "requests",
-#   "pandas",
-# ]
-# ///
-
-import requests
-import pandas as pd
-
-# Your code here
-```
-
-Run with automatic dependency installation:
+Run tools temporarily when testing, comparing versions, or avoiding persistent installs:
 
 ```bash
-# UV installs dependencies automatically
+uv tool run ruff check .
+uvx ruff@0.6.9 format .
+```
+
+Prefer `uv tool install` for daily tools and `uv tool run` / `uvx` for one-off execution.
+
+### 3. Scripts and One-Off Commands
+
+Prefer `uv run` for local scripts:
+
+```bash
 uv run script.py
+uv run python scripts/generate_report.py
+uv run --with httpx --with rich python scripts/check_api.py
 ```
 
-**Benefits:**
+Use PEP 723 inline metadata for single-file scripts, then maintain them with:
 
-- Self-contained single-file scripts
-- No pyproject.toml needed
-- Easy sharing and distribution
-- Perfect for utilities and automation
+```bash
+uv init --script cleanup.py --python 3.12
+uv add --script cleanup.py rich httpx
+uv run cleanup.py
+```
 
-See [Inline Script Metadata Reference](references/inline-script-metadata.md) for comprehensive examples including MCP servers, web applications, data processing, and CLI tools.
+### 4. Python Runtime Management
 
-## Integration Patterns
+Use `uv python` for interpreter lifecycle management:
 
-### VS Code MCP Configuration
+```bash
+uv python install 3.12 3.13
+uv python list
+uv python pin 3.12
+uv python find 3.12
+uv python dir
+uv python upgrade
+uv python update-shell
+```
 
-For `.vscode/mcp.json` or user settings:
+When the exact Python version matters, specify it explicitly. Do not rely on whatever the current default minor version happens to be.
+
+### 5. Compatibility / Pip Interface
+
+Use `uv pip` only when preserving an existing pip-style environment:
+
+```bash
+uv venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
+uv pip install -e .
+```
+
+This path is valid for migrations and legacy repos, but it is not the preferred default for new uv projects.
+
+## MCP Guidance
+
+### Published MCP Servers
+
+For published packages, `uvx` remains a practical choice because many editor examples already use it:
 
 ```json
 {
-  "servers": {
-    "published-server": {
+  "mcpServers": {
+    "sqlite": {
       "type": "stdio",
       "command": "uvx",
-      "args": ["mcp-server-sqlite", "--db-path", "${workspaceFolder}/db.sqlite"]
-    },
-    "local-dev": {
+      "args": ["mcp-server-sqlite", "--db-path", "/path/to/db.sqlite"]
+    }
+  }
+}
+```
+
+Interpret that as `uv tool run`, not as a separate product surface.
+
+### Local MCP Server Development
+
+Prefer `uv run` for local server code:
+
+```json
+{
+  "mcpServers": {
+    "local-server": {
       "type": "stdio",
-      "command": "uvx",
+      "command": "uv",
       "args": [
-        "--from", "${workspaceFolder}",
+        "run",
+        "--directory",
+        "/absolute/path/to/project",
+        "python",
         "src/server.py"
       ]
     }
@@ -274,230 +189,82 @@ For `.vscode/mcp.json` or user settings:
 }
 ```
 
-### Continue IDE Configuration
+Prefer this over `uvx --from ... script.py` when the goal is to execute local project code with its project environment.
 
-For `.continue/config.json`:
+### Reproducibility Rules
 
-```json
-{
-  "experimental": {
-    "modelContextProtocolServers": [
-      {
-        "transport": {
-          "type": "stdio",
-          "command": "uvx",
-          "args": ["mcp-server-fetch"]
-        }
-      }
-    ]
-  }
-}
-```
+- Pin external package versions in checked-in configs when reproducibility matters.
+- Avoid floating latest specifiers in editor settings, CI, and shared automation.
+- Use absolute paths when editors cannot resolve the workspace correctly.
 
-### GitHub Actions CI/CD
+## Shell and PATH Repair
 
-```yaml
-- name: Setup UV
-  uses: astral-sh/setup-uv@v1
-
-- name: Install dependencies
-  run: uv pip install -r requirements.txt
-
-- name: Run tests
-  run: uv run pytest
-```
-
-## Best Practices
-
-### Tool Management
-
-**DO:**
-
-- Use `uv tool install` for development tools used frequently
-- Use `uvx` for MCP servers (follows community patterns)
-- Keep tools isolated in their own environments
-- Regularly upgrade tools with `uv tool upgrade --all`
-
-**DON'T:**
-
-- Use global pip for CLI tools (causes dependency conflicts)
-- Install MCP servers with `uv tool install` (against community patterns)
-- Use `uvx` for daily development tools (unnecessary overhead)
-- Mix pip and uv tool installations
-
-### MCP Server Patterns
-
-**DO:**
-
-- Use UVX for all MCP server execution
-- Use `--from` for local development
-- Pin versions for production (`package@1.2.3`)
-- Use environment variables for configuration
-
-**DON'T:**
-
-- Install MCP servers globally
-- Mix working directory approaches
-- Use `@latest` in production (unstable)
-- Forget to specify absolute paths with `--from`
-
-### Virtual Environments
-
-**DO:**
-
-- Use `python -m venv` for project environments
-- Activate before installing packages
-- Use `uv pip install` for faster package installation
-- Document activation commands in README
-
-**DON'T:**
-
-- Install packages globally
-- Mix venv and system Python packages
-- Forget to activate before development
-- Commit .venv directory to version control
-
-## Performance Characteristics
-
-UV's performance advantages:
-
-- **10-100x faster** than pip for package operations
-- **Parallel downloads** and installations
-- **Global cache** with deduplication
-- **Rust-powered** dependency resolution
-- **Disk-efficient** storage with hard links
-
-Typical operation times:
-
-- Package installation: 100-1000x faster than pip
-- Dependency resolution: Near-instant for cached packages
-- Virtual environment creation: <1 second
-- UVX first run: Package download time + execution
-- UVX cached run: <1 second startup
-
-## Troubleshooting
-
-### Common Issues
-
-**"spawn uvx ENOENT" Error:**
-
-- UV/UVX not in PATH
-- Solution: Reinstall UV or add to PATH manually
-
-**Package Not Found:**
-
-- Check package name on PyPI
-- For local development, verify `--from` path
-- Ensure `pyproject.toml` exists
-
-**Permission Errors:**
-
-- UV cache directory not writable
-- Solution: Check permissions on `~/.cache/uv/`
-
-**Version Conflicts:**
-
-- Multiple Python versions
-- Solution: Use `uv python pin` to set project version
-
-See detailed troubleshooting in:
-
-- [Installation & Setup Reference](references/installation-and-setup.md#troubleshooting)
-- [Tool Management Reference](references/tool-management.md#troubleshooting)
-- [MCP Integration Reference](references/mcp-integration.md#troubleshooting)
-
-## Reference Documentation
-
-This skill includes detailed reference documentation:
-
-1. **[Recent Changes](references/recent-changes.md)** ⭐ NEW
-   - Latest version information (0.9.7+)
-   - Python 3.14 default and free-threading support
-   - New features and breaking changes
-   - Version compatibility matrix
-   - Upgrade guidance
-
-2. **[Installation & Setup](references/installation-and-setup.md)**
-   - Installation methods (Windows, Linux, Mac)
-   - Virtual environment setup
-   - Platform-specific considerations
-
-3. **[Tool Management](references/tool-management.md)**
-   - UV tool install vs UVX comparison
-   - Persistent vs temporary execution
-   - Maintenance workflows
-
-4. **[MCP Integration](references/mcp-integration.md)**
-   - Published package patterns
-   - Local development with --from
-   - VS Code and IDE configuration
-
-5. **[Python Environment](references/python-environment.md)**
-   - Python version management
-   - System paths (pyenv, uv, system)
-   - Cross-platform compatibility
-
-6. **[Inline Script Metadata](references/inline-script-metadata.md)**
-   - PEP 723 inline dependencies in comments
-   - Single-file scripts with automatic dependency management
-   - MCP servers, web apps, and CLI tools
-   - Best practices and troubleshooting
-
-7. **[Examples](examples/README.md)**
-   - Real-world GitHub configurations
-   - Common workflow patterns
-   - Anti-patterns to avoid
-
-## External Resources
-
-- **UV Official Documentation**: <https://docs.astral.sh/uv/>
-- **UV GitHub Repository**: <https://github.com/astral-sh/uv>
-- **MCP Official Documentation**: <https://modelcontextprotocol.io/>
-- **MCP Servers Repository**: <https://github.com/modelcontextprotocol/servers>
-- **VS Code MCP Support**: <https://code.visualstudio.com/docs/copilot/chat/mcp-servers>
-
-## Migration Guides
-
-### From pip
+When commands exist but editors cannot find them, repair shell integration first:
 
 ```bash
-# Old way
-pip install requests
-
-# New way
-uv pip install requests
+uv tool update-shell
+uv python update-shell
+command -v uv
+command -v uvx
 ```
 
-### From pipx
+If an IDE still cannot resolve `uv` or `uvx`, use the absolute executable path in the config.
+
+## Operating Rules For This Skill
+
+- Verify the installed version before giving version-sensitive advice.
+- Prefer project metadata over ad-hoc virtualenv commands when both are available.
+- Prefer `uv run` for local project commands and scripts.
+- Explain that `uvx` is the alias of `uv tool run` when the distinction matters.
+- Treat `uv pip` as a compatibility layer, not the first recommendation.
+- Pin versions in persistent configs; leave floating versions only for explicit ad-hoc testing.
+- Surface failures directly. Do not invent fallback commands that hide environment problems.
+
+## References To Load On Demand
+
+- `references/recent-changes.md`
+  Current baseline, official sources, and migration notes from the old `0.9.x` guidance.
+- `references/installation-and-setup.md`
+  Installation, new-project bootstrap, and compatibility-mode setup.
+- `references/tool-management.md`
+  Detailed comparison of `uv tool install`, `uv tool run`, and `uvx`.
+- `references/python-environment.md`
+  Python runtime installation, pinning, shell integration, and interpreter selection.
+- `references/inline-script-metadata.md`
+  PEP 723 script workflow, `uv init --script`, `uv add --script`, and `uv run`.
+- `references/mcp-integration.md`
+  Published vs local MCP execution patterns and editor configuration.
+
+## Short Answer Templates
+
+### New Project
 
 ```bash
-# Old way
-pipx install black
-
-# New way
-uv tool install black
-```
-
-### From poetry
-
-```bash
-# Old way
-poetry add requests
-poetry install
-
-# New way
+uv init my-app
+cd my-app
 uv add requests
 uv sync
+uv run python -m my_app
 ```
 
-## Summary
+### Daily Tool
 
-UV provides a unified, fast, and modern approach to Python package management. The key to effective UV usage is:
+```bash
+uv tool install ruff
+uv tool update-shell
+ruff check .
+```
 
-1. **Understand the tool landscape**: uv pip, uv tool, uvx each serve specific purposes
-2. **Follow community patterns**: Use UVX for MCP servers, uv tool for development tools
-3. **Leverage isolation**: Each tool gets its own environment preventing conflicts
-4. **Use --from for local development**: Essential pattern for MCP server development
-5. **Keep tools updated**: Regular maintenance prevents issues
+### One-Off Tool
 
-By following these patterns and utilizing the reference documentation, you'll have a clean, efficient, and maintainable Python development environment.
+```bash
+uvx ruff@0.6.9 check .
+```
+
+### Existing `requirements.txt`
+
+```bash
+uv venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
+```

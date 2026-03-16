@@ -490,14 +490,14 @@ uv run script.py arg1 arg2 --flag
 uv run --python 3.11 script.py
 ```
 
-### Using uvx
+### Prefer uv run for script execution
 
 ```bash
-# Run from any location
-uvx /path/to/script.py
+# Run a script by path
+uv run /path/to/script.py
 
 # With arguments
-uvx script.py --input data.csv --output results.csv
+uv run script.py --input data.csv --output results.csv
 ```
 
 ### In IDE Configurations
