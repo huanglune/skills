@@ -16,7 +16,7 @@ id,task,status,completed_at,notes
 **场景**：修复一个 OAuth 回调 bug，并保留完整恢复能力。
 
 ```text
-.codex-tasks/20260313-auth-fix/
+.codex-tasks/20260313-101530-auth-fix/
 ├── SPEC.md
 ├── TODO.csv
 ├── PROGRESS.md
@@ -28,21 +28,21 @@ id,task,status,completed_at,notes
 **场景**：同时交付账单看板的后端、前端和文档。
 
 ```text
-.codex-tasks/20260313-billing-epic/
+.codex-tasks/20260313-103000-billing-epic/
 ├── EPIC.md
 ├── SUBTASKS.csv
 ├── PROGRESS.md
 └── tasks/
-    ├── 20260313-api/
-    ├── 20260313-frontend/
-    └── 20260313-docs/
+    ├── 20260313-103500-api/
+    ├── 20260313-104200-frontend/
+    └── 20260313-104800-docs/
 ```
 
 ```csv
 id,task,task_type,status,depends_on,task_dir,acceptance_criteria,validation_command,completed_at,retry_count,notes
-1,实现账单 API,single-full,DONE,,tasks/20260313-api,API 测试通过,pytest tests/billing_api.py,2026-03-13 10:12,0,
-2,构建账单 UI,single-full,IN_PROGRESS,1,tasks/20260313-frontend,界面能正确渲染发票,npm test -- --grep billing,,0,
-3,更新账单文档,batch,TODO,1;2,tasks/20260313-docs,所有文档行都成功,python3 scripts/validate_docs.py,,0,
+1,实现账单 API,single-full,DONE,,tasks/20260313-103500-api,API 测试通过,pytest tests/billing_api.py,2026-03-13 10:12 CST,0,
+2,构建账单 UI,single-full,IN_PROGRESS,1,tasks/20260313-104200-frontend,界面能正确渲染发票,npm test -- --grep billing,,0,
+3,更新账单文档,batch,TODO,1;2,tasks/20260313-104800-docs,所有文档行都成功,python3 scripts/validate_docs.py,,0,
 ```
 
 ## Batch 任务
@@ -50,7 +50,7 @@ id,task,task_type,status,depends_on,task_dir,acceptance_criteria,validation_comm
 **场景**：审计 80 个 Markdown 文件的 frontmatter 一致性。
 
 ```text
-.codex-tasks/20260313-doc-audit/
+.codex-tasks/20260313-111500-doc-audit/
 ├── SPEC.md
 ├── TODO.csv
 ├── PROGRESS.md
@@ -83,20 +83,20 @@ id,status,summary,changed,evidence_path,error
 ### 目录结构
 
 ```text
-.codex-tasks/20260313-i18n-epic/
+.codex-tasks/20260313-140000-i18n-epic/
 ├── EPIC.md
 ├── SUBTASKS.csv
 ├── PROGRESS.md
 └── tasks/
-    ├── 20260313-i18n-api/           ← single-full 子任务
+    ├── 20260313-140500-i18n-api/    ← single-full 子任务
     │   ├── SPEC.md
     │   ├── TODO.csv
     │   └── PROGRESS.md
-    ├── 20260313-i18n-frontend/      ← single-full 子任务
+    ├── 20260313-141200-i18n-frontend/ ← single-full 子任务
     │   ├── SPEC.md
     │   ├── TODO.csv
     │   └── PROGRESS.md
-    └── 20260313-i18n-translate/     ← batch 子任务
+    └── 20260313-141900-i18n-translate/ ← batch 子任务
         ├── SPEC.md
         ├── TODO.csv                 ← 3 步 Batch 计划
         ├── PROGRESS.md
@@ -110,12 +110,12 @@ id,status,summary,changed,evidence_path,error
 
 ```csv
 id,task,task_type,status,depends_on,task_dir,acceptance_criteria,validation_command,completed_at,retry_count,notes
-1,实现 i18n API,single-full,DONE,,tasks/20260313-i18n-api,API 能返回翻译后的文案,pytest tests/i18n_api.py,2026-03-13 09:40,0,
-2,在前端集成 i18n,single-full,IN_PROGRESS,1,tasks/20260313-i18n-frontend,界面能按所选语言渲染,npm test -- --grep i18n,,0,
-3,批量翻译 40 个 locale 文件,batch,TODO,1,tasks/20260313-i18n-translate,所有 locale 行都通过,test -f tasks/20260313-i18n-translate/batch/workers-output.csv,,0,
+1,实现 i18n API,single-full,DONE,,tasks/20260313-140500-i18n-api,API 能返回翻译后的文案,pytest tests/i18n_api.py,2026-03-13 09:40 CST,0,
+2,在前端集成 i18n,single-full,IN_PROGRESS,1,tasks/20260313-141200-i18n-frontend,界面能按所选语言渲染,npm test -- --grep i18n,,0,
+3,批量翻译 40 个 locale 文件,batch,TODO,1,tasks/20260313-141900-i18n-translate,所有 locale 行都通过,test -f tasks/20260313-141900-i18n-translate/batch/workers-output.csv,,0,
 ```
 
-### Batch 子任务 TODO.csv（tasks/20260313-i18n-translate/）
+### Batch 子任务 TODO.csv（tasks/20260313-141900-i18n-translate/）
 
 ```csv
 id,task,status,acceptance_criteria,validation_command,completed_at,retry_count,notes

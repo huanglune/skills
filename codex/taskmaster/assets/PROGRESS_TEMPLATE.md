@@ -7,12 +7,14 @@
 
 ## 会话开始
 
-- **日期**: YYYY-MM-DD HH:MM
+- **日期**: YYYY-MM-DD HH:MM CST
 - **任务名**: `<task-name>`
 - **任务目录**: `.codex-tasks/<task-name>/`
 - **说明**: 见 `SPEC.md`
 - **计划**: 见 `TODO.csv`（N 个里程碑）
 - **环境**: <language> / <framework> / <test runner>
+
+> 默认使用上海时间（`Asia/Shanghai`）；若用户明确指定其他时区，再按用户要求覆盖。
 
 ---
 
@@ -38,8 +40,8 @@
 ## 里程碑 N：<title>
 
 - **状态**: DONE | FAILED
-- **开始时间**: HH:MM
-- **完成时间**: HH:MM
+- **开始时间**: HH:MM CST
+- **完成时间**: HH:MM CST
 - **完成内容**:
   -
 - **关键决策**:

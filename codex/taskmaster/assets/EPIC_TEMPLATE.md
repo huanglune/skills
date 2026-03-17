@@ -47,12 +47,12 @@
 ## 目录示例
 
 ```text
-.codex-tasks/20260313-billing-epic/
+.codex-tasks/20260313-103000-billing-epic/
 ├── EPIC.md
 ├── SUBTASKS.csv
 ├── PROGRESS.md
 └── tasks/
-    ├── 20260313-api/
-    ├── 20260313-frontend/
-    └── 20260313-docs/
+    ├── 20260313-103500-api/
+    ├── 20260313-104200-frontend/
+    └── 20260313-104800-docs/
 ```

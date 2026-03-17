@@ -1,20 +1,7 @@
 ---
 name: taskmaster
-description: >
-  Unified task execution protocol for Codex-only work. Supports Single Task,
-  Epic Task, and Batch Task while preserving CSV truth-source, validation
-  gates, context recovery, and Debug-First failure exposure.
-
-  WHEN TO USE: user asks to "track tasks", "create todo list", "make a plan",
-  "track progress", "long task", "big project", "build from scratch",
-  "autonomous session", "跟踪任务", "自主执行", "长时任务", "从零开始",
-  "任务管理", "做个计划", "大工程", or when a task clearly requires 3+
-  ordered steps that produce file changes.
-
-  DO NOT USE: single-step fixes, pure Q&A, code review, explaining code,
-  search/research tasks, tasks with fewer than 3 steps, or tasks that do not
-  produce file changes.
-version: 5.0.1
+description: Unified task execution protocol for Codex-only work. Use for 3+ ordered file-changing steps, task tracking, autonomous execution, or long-running work that needs recoverable artifacts.
+version: 5.0.2
 ---
 
 # Taskmaster — v5 Task Protocol
@@ -44,6 +31,13 @@ shapes:
 - Treat task artifacts as user-visible content: `SPEC.md`, `PROGRESS.md`, `EPIC.md`, `BATCH.md`, and human-readable CSV cell values must follow the user's language.
 - Keep protocol-stable identifiers in ASCII English for compatibility: file names, CSV headers, status enums, and task-shape enums remain unchanged.
 - Translate template prose and examples before writing files; do not copy English example text into generated artifacts by default.
+
+## Naming & Timezone Contract
+
+- Default every task, epic, and child-task directory name to `YYYYMMDD-HHMMSS-<slug>`.
+- Interpret that timestamp in `Asia/Shanghai` unless the user explicitly requests another timezone.
+- Use the same default timezone for `completed_at`, `PROGRESS.md` dates, and other task timestamps; include an explicit timezone label such as `CST` or `+08:00` when writing human-readable times.
+- If the runtime environment uses another timezone, convert before naming or logging time; when UTC and Shanghai dates differ, trust the converted Shanghai date.
 
 ## Shape Router
 
@@ -102,7 +96,7 @@ survive a context reset. This is the default single-task path.
 Full Single directory example:
 
 ```text
-.codex-tasks/20260313-auth-fix/
+.codex-tasks/20260313-101530-auth-fix/
 ├── SPEC.md
 ├── TODO.csv
 ├── PROGRESS.md
@@ -135,14 +129,14 @@ deliverables or dependency chains.
 Epic directory example:
 
 ```text
-.codex-tasks/20260313-billing-epic/
+.codex-tasks/20260313-103000-billing-epic/
 ├── EPIC.md
 ├── SUBTASKS.csv
 ├── PROGRESS.md
 └── tasks/
-    ├── 20260313-api/
-    ├── 20260313-frontend/
-    └── 20260313-docs/
+    ├── 20260313-103500-api/
+    ├── 20260313-104200-frontend/
+    └── 20260313-104800-docs/
 ```
 
 Epic workflow:
@@ -179,7 +173,7 @@ Batch Task is for homogeneous row-level work that should be executed through
 Batch directory example:
 
 ```text
-.codex-tasks/20260313-doc-audit/
+.codex-tasks/20260313-111500-doc-audit/
 ├── SPEC.md
 ├── TODO.csv
 ├── PROGRESS.md

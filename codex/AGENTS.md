@@ -4,6 +4,11 @@
 
 Default to Chinese in user-facing replies unless the user explicitly requests another language.
 
+## Timezone
+
+- Default to `Asia/Shanghai` for task names, task logs, date formatting, and time-related reasoning unless the user explicitly requests another timezone.
+- When the runtime environment uses another timezone, convert explicitly and include the timezone label when the date or time could be ambiguous.
+
 ## Response Style
 
 Do not propose follow-up tasks or enhancement at the end of your final answer.
