@@ -1,247 +1,94 @@
 # AI Coding Skills
 
-个人可复用的 AI 编程技能包，包含 Codex Skills，以及面向 Claude Code 的协作编排协议。
-
-## 快速部署
-
-```bash
-git clone <repo-url>
-
-# Codex Skills → ~/.codex/skills，Claude Skills → ~/.claude/skills
-mkdir -p ~/.codex/skills ~/.claude/skills
-cp codex/AGENTS.md ~/.codex/
-bash scripts/sync_skills.sh --dry-run
-bash scripts/sync_skills.sh
-
-# Claude Code 协作协议可直接作为上下文使用
-# 详见 claude/codex-atelier/PROMPT.md
-```
-
-`scripts/sync_skills.sh` 会自动发现 `codex/` 与 `claude/` 下所有包含 `SKILL.md` 的技能目录，并分别同步到 `~/.codex/skills/` 与 `~/.claude/skills/`。它不会把 `codex/AGENTS.md` 当作 skill 同步，也不会删除你本机已有的其他无关 skills；对于同名技能目录，会用 `rsync --delete` 按仓库内容镜像更新。`--dry-run` 只预览将要执行的同步动作。
-
-## 同步脚本
-
-仓库根目录提供了 [`scripts/sync_skills.sh`](scripts/sync_skills.sh)，用于把当前仓库里的 skills 同步到本机。
-
-用法：
-
-```bash
-bash scripts/sync_skills.sh --dry-run
-bash scripts/sync_skills.sh
-```
-
-行为说明：
-
-- 自动扫描 `codex/` 与 `claude/` 下所有包含 `SKILL.md` 的目录
-- `codex/` 同步到 `~/.codex/skills/`，`claude/` 同步到 `~/.claude/skills/`
-- 不会把 `codex/AGENTS.md` 误当作 skill 复制
-- 不会删除本机其他无关的 skills
-- 会对同名 skill 目录做镜像同步
+用于维护、同步和发布 Codex skills 的仓库。根目录 `README.md` 只保留仓库级入口信息；每个 skill 的定位、触发条件和具体用法请直接查看对应目录下的 `SKILL.md`。
 
 ## Skills
 
-### 1. skill-creator — Skill 创建向导
+- [skill-creator](codex/skill-creator/SKILL.md)
+- [taskmaster](codex/taskmaster/SKILL.md)
+- [todo-list-csv](codex/todo-list-csv/SKILL.md)
+- [uv](codex/uv/SKILL.md)
 
-这是一个"用来创建 Skill 的 Skill"，指导如何把某类知识、流程、工具封装成可复用的技能包。
+全局规则位于 [codex/AGENTS.md](codex/AGENTS.md)。
 
-核心结构：
-
-- `SKILL.md`（必需）：YAML 元数据 + Markdown 指令，决定 Skill 何时触发、如何使用
-- `scripts/`：可执行脚本，适合需要确定性执行的重复操作
-- `references/`：参考文档，按需读入上下文（API 文档、schema 等）
-- `assets/`：输出资源（模板、图片、字体），不需要读入上下文
-
-创建流程 6 步：
-
-1. 通过具体例子理解 Skill 要解决什么问题
-2. 从例子中抽象可复用内容（脚本、文档、模板）
-3. `init_skill.py` 初始化目录骨架
-4. 编辑 SKILL.md 和资源文件
-5. `package_skill.py` 校验 + 打包成 zip
-6. 实际使用后迭代改进
-
-渐进式披露设计：元数据始终在上下文（~100词）→ SKILL.md 触发时加载（<5k词）→ 资源按需展开（无限），最大化节省 token。
-
-### 2. taskmaster — 多步骤任务执行协议（v5）
-
-这是 Codex 处理多步骤工程任务的默认执行协议，核心价值在于把长任务变成可落盘、可验证、可恢复、可升级、可并发的执行流程。
-
-三种任务形态：
-
-| 形态 | 适用场景 | 真相文件 | 示例 |
-|------|---------|---------|------|
-| Single Task | 单个交付物 | `TODO.csv` 或 `SPEC.md + TODO.csv + PROGRESS.md` | 修一个 OAuth bug |
-| Epic Task | 多模块/多依赖链 | `EPIC.md + SUBTASKS.csv + PROGRESS.md` | 跨 API/UI/文档的 billing dashboard |
-| Batch Task | 同质行级并发 | `BATCH.md + workers-input/output.csv` | 审计 80 个 Markdown 文件 |
-
-关键设计原则：
-
-- CSV 真相源：磁盘文件优先于聊天记忆
-- 显式验证门：没验证就不能标 DONE
-- Debug-First：失败必须暴露，不能静默降级
-- 上下文恢复：冷启动仅靠文件即可恢复，恢复消息包含 任务/形态/进度/当前/文件/下一步 六个字段
-- 支持中途升级：Single→Epic，Single/Epic 步骤→Batch
-
-### 3. todo-list-csv — 轻量级 CSV 任务跟踪
-
-面向"会改动项目内容"的任务，在项目根目录创建临时 CSV 清单，与 `update_plan` 双轨同步，完成后自动删除。
-
-工作流：
-
-1. 拆任务为 3-12 个可验收步骤，同时建立 `update_plan`
-2. 在项目根创建 `{任务名} TO DO list.csv`，表头 `id,item,status,done_at,notes`
-3. 状态机严格单向：`TODO → IN_PROGRESS → DONE`，任意时刻最多 1 行 IN_PROGRESS
-4. 每完成一项，先更新 CSV，再通过 `plan --normalize` 同步到 `update_plan`
-5. 全部 DONE 后删除 CSV，避免遗留在仓库
-
-自动化脚本 `todo_csv.py` 支持：`init`（创建）、`advance`（推进一步）、`start`（指定开始）、`plan`（生成 plan JSON）、`status`（查看进度）、`cleanup`（清理）等命令。
-
-### 4. codex-atelier — Claude Code 架构工坊协议
-
-这是一个面向 Claude Code 的协作编排 Skill，仓库路径为 `claude/codex-atelier/`，用来固定“Claude 做架构与调度，Codex 做执行、评审、验证”的分工。
-
-适用场景：
-
-- 需要先做架构简报，再把任务拆成多个 Codex 工作包
-- 中高风险任务不能只依赖单个执行结果，需要 Reviewer 或 Verifier
-- 复杂项目需要多个 Codex 并行执行，并由 Claude 统一裁决冲突
-
-核心约束：
-
-- Claude 负责目标澄清、架构拆解、任务编排、质量仲裁
-- Codex 按角色承担 `Executor`、`Reviewer`、`Verifier`、`Investigator`
-- 每个工作包都要带目标、上下文、文件边界、验证命令、完成定义
-- 交付时只汇总真实执行结果和证据，不接受伪成功或静默降级
-
-主要文件：
-
-- `SKILL.md`：说明何时触发、如何路由协作拓扑
-- `PROMPT.md`：可直接作为 Claude Code 协议文本使用
-- `references/cross-check.md`：交叉检查细则
-- `references/examples.md`：工作包样例与模板
-
-### 5. uv — Python 包与环境管理
-
-这是一个以 `uv 0.10.10` 为当前基线的 Python 开发 skill，默认推荐项目优先工作流 `uv init` / `uv add` / `uv sync` / `uv run`，并明确区分 `uv tool install`、`uv tool run` / `uvx`、`uv pip` 三类路径的使用边界。
-
-适用场景：
-
-- 需要创建或维护基于 `pyproject.toml` 的 `uv` 项目
-- 需要判断 `uv tool install`、`uv tool run` / `uvx`、`uv run` 的职责边界
-- 需要运行 MCP server，并区分“发布包用 `uvx`，本地项目代码用 `uv run`”
-- 需要处理 Python 版本安装、固定、升级、shell 集成
-- 需要从 `pip`、`pipx`、`poetry`、`pyenv` 迁移到 `uv`
-- 需要在 `requirements.txt` 环境下使用 `uv venv` + `uv pip` 兼容模式
-
-包含内容：
-
-- `SKILL.md`：当前基线、默认决策表、项目工作流与命令分工
-- `references/`：安装与初始化、工具管理、Python 运行时、MCP 集成、版本变更等参考文档
-- `examples/`：本地脚本、MCP 配置、迁移、CI/CD 等示例
-- `docs/`：skill 测试与发布相关文档
-
-来源仓库：
-
-- [s2005/uv-skill](https://github.com/s2005/uv-skill)
-
-### 对比
-
-| | taskmaster | todo-list-csv | skill-creator | codex-atelier | uv |
-|---|---|---|---|---|---|
-| 定位 | 重量级任务执行协议 | 轻量级 CSV 跟踪 | 元工具（创建 Skill） | Claude Code 协作编排协议 | Python 包与环境管理 skill |
-| 适合 | 复杂长任务、自主执行 | 中等复杂度改动任务 | 封装新的可复用技能包 | Claude 做架构、Codex 做执行的多代理协作 | `uv` 项目工作流、`uv tool` / `uvx`、Python 运行时、MCP 集成、兼容模式迁移 |
-
-## 目录结构
-
-```text
-skills/
-├── README.md
-├── scripts/
-│   └── sync_skills.sh         # 自动同步 codex/ -> ~/.codex/skills/，claude/ -> ~/.claude/skills/
-├── codex/
-│   ├── AGENTS.md              # 全局 Agent 规则（部署到 ~/.codex/，不是 skills/）
-│   ├── skill-creator/
-│   │   ├── SKILL.md
-│   │   ├── LICENSE.txt
-│   │   └── scripts/           # init_skill.py, package_skill.py, quick_validate.py
-│   ├── taskmaster/
-│   │   ├── SKILL.md
-│   │   └── assets/            # 模板文件（SPEC、PROGRESS、TODO CSV、EPIC、BATCH 等）
-│   ├── uv/
-│   │   ├── SKILL.md
-│   │   ├── references/
-│   │   ├── examples/
-│   │   └── docs/              # guides/, tasks/
-│   └── todo-list-csv/
-│       ├── SKILL.md
-│       └── scripts/           # todo_csv.py
-└── claude/
-    └── codex-atelier/
-        ├── SKILL.md
-        ├── PROMPT.md
-        └── references/        # cross-check.md, examples.md, output-schema.json
-```
-
-## 依赖
-
-- Python 3（辅助脚本）
-- rsync（`scripts/sync_skills.sh` 依赖）
-- [OpenAI Codex CLI](https://github.com/openai/codex)
-
-## 配置 Codex MCP（在 Claude Code 中调用 Codex）
-
-将 Codex 注册为 Claude Code 的 MCP Server 后，Claude 可以把子任务分发给 Codex 并行执行。
-
-### 1. 安装 Codex CLI
+## 本地同步
 
 ```bash
-npm install -g @openai/codex
-codex login
+mkdir -p ~/.codex/skills
+cp codex/AGENTS.md ~/.codex/
+bash scripts/sync_skills.sh --dry-run
+bash scripts/sync_skills.sh
 ```
 
-### 2. 注册 MCP Server
+`scripts/sync_skills.sh` 会扫描 `codex/` 下包含 `SKILL.md` 的目录，并同步到 `~/.codex/skills/`。
 
-编辑 `~/.claude.json`，在 `mcpServers` 中添加：
+## 从 Smithery 直接安装
 
-macOS / Linux：
+适合消费已经发布到 Smithery 的版本，而不是直接复制当前工作树。
 
-```json
-{
-  "codex": {
-    "command": "codex",
-    "args": ["mcp-server"],
-    "type": "stdio"
-  }
-}
+Quickstart：
+
+```bash
+npx @smithery/cli@latest skill add huanglune/skill-creator --agent codex --global
+npx @smithery/cli@latest skill add huanglune/codex-taskmaster --agent codex --global
+npx @smithery/cli@latest skill add huanglune/todo-list-csv --agent codex --global
+npx @smithery/cli@latest skill add huanglune/uv --agent codex --global
 ```
 
-Windows：
+批量执行：
 
-```json
-{
-  "codex": {
-    "command": "cmd",
-    "args": ["/c", "codex", "mcp-server"],
-    "type": "stdio"
-  }
-}
+```bash
+for skill in skill-creator codex-taskmaster todo-list-csv uv; do
+  npx @smithery/cli@latest skill add "huanglune/${skill}" --agent codex --global
+done
 ```
 
-### 3. 重启 Claude Code 并测试
+```bash
+npm install -g @smithery/cli
 
+# 列出当前仓库有哪些 skill 可以映射成 Smithery 安装目标
+bash scripts/install_smithery_skills.sh --list
+
+# 预览单个 skill 的安装命令
+bash scripts/install_smithery_skills.sh --skill taskmaster --namespace <namespace> --dry-run
+
+# 安装单个 skill 到当前项目
+bash scripts/install_smithery_skills.sh --skill taskmaster --namespace <namespace>
+
+# 安装全部 skill 到当前项目
+bash scripts/install_smithery_skills.sh --all --namespace <namespace>
+
+# 或者全局安装到当前 agent
+bash scripts/install_smithery_skills.sh --all --namespace <namespace> --global
 ```
-mcp__codex__codex
-参数: {"prompt": "Say hello", "sandbox": "read-only"}
+
+说明：
+
+- 上面的 `npx @smithery/cli@latest ... --global` 会安装到 `~/.agents/skills/`。
+- `scripts/install_smithery_skills.sh` 只根据 `codex/` 下包含 `SKILL.md` 的目录推导安装目标名。
+- `taskmaster` 为避开 Smithery 上的 slug 冲突，远端发布名为 `codex-taskmaster`，但安装到本地后仍然是 `taskmaster`。
+- 项目级安装会在当前目录生成 `./.agents/skills/` 和 `./skills-lock.json`。
+- `--global` 会改为写入 `~/.agents/skills/` 和 `~/.agents/.skill-lock.json`。
+- 只有当对应 skill 已经发布到目标 namespace 时，安装才会成功；未发布时会由 `smithery skill add` 显式报错。
+
+## 发布到 Smithery
+
+```bash
+npm install -g @smithery/cli
+smithery auth login
+
+# 列出可发布的 skills
+bash scripts/publish_smithery_skills.sh --list
+
+# 预览单个 skill 的发布命令
+bash scripts/publish_smithery_skills.sh --skill taskmaster --dry-run
+
+# 发布单个 skill
+bash scripts/publish_smithery_skills.sh --skill taskmaster --namespace <namespace>
+
+# 发布全部 skills
+bash scripts/publish_smithery_skills.sh --all --namespace <namespace>
 ```
 
-Codex MCP 暴露两个工具：
-
-| 工具 | 功能 |
-|------|------|
-| `codex` | 启动新的 Codex 会话 |
-| `codex-reply` | 继续已有的 Codex 会话 |
-
-## 引用
-
-- 本项目的说明结构与部分组织方式参考了 [lili-luo/aicoding-cookbook](https://github.com/lili-luo/aicoding-cookbook)
-- `uv` skill 的上游内容整理自 [s2005/uv-skill](https://github.com/s2005/uv-skill)
+`scripts/publish_smithery_skills.sh` 只处理 `codex/` 下包含 `SKILL.md` 的 skill 目录。
+其中 `taskmaster` 会发布到 `codex-taskmaster` slug，以避开 Smithery 上的同名条目冲突。

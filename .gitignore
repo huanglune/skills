@@ -22,5 +22,9 @@ pnpm-debug.log*
 .vscode/
 .idea/
 
+# Smithery
+.agents/
+skills-lock.json
+
 # Task artifacts
 .codex-tasks/
