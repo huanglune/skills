@@ -1,7 +1,7 @@
 ---
 name: taskmaster
 description: Unified task execution protocol for Codex-only work. Use for 3+ ordered file-changing steps, task tracking, autonomous execution, or long-running work that needs recoverable artifacts.
-version: 5.0.2
+version: 5.0.3
 ---
 
 # Taskmaster — v5 Task Protocol
@@ -17,16 +17,15 @@ shapes:
 - **Batch Task** — homogeneous row-level work executed through `spawn_agents_on_csv`
 
 ## Core Principles
-
 1. The current truth artifact on disk wins over memory.
 2. No step, subtask, or batch row becomes `DONE` without explicit validation.
 3. Keep verbose reasoning in `PROGRESS.md`, `EPIC.md`, or batch output files, not in the chat.
 4. Keep failures visible. Do not silently downgrade to manual or serial execution.
 5. Keep planning CSVs and batch worker CSVs separate.
 6. Build for Codex-only recovery: a cold restart must be resumable from files alone.
+7. The latest user turn decides the current response; prior summaries, `task_complete` output, and earlier final answers are context only.
 
 ## Language Contract
-
 - Default all human-readable generated content to Chinese unless the user explicitly requests another language.
 - Treat task artifacts as user-visible content: `SPEC.md`, `PROGRESS.md`, `EPIC.md`, `BATCH.md`, and human-readable CSV cell values must follow the user's language.
 - Keep protocol-stable identifiers in ASCII English for compatibility: file names, CSV headers, status enums, and task-shape enums remain unchanged.
@@ -253,6 +252,8 @@ When complexity outgrows the current shape, promote in-place:
 - Keep retry counts explicit.
 - Keep raw fetched material under `raw/` for Full, Epic, and Batch shapes.
 - If the work is heterogeneous, use a dedicated multi-agent flow instead of forcing it into Batch.
+- If the user switches from task execution to a read-only question, explanation, or review, answer that request directly instead of restating the last milestone summary.
+- Before any final answer, verify it explicitly answers the latest user request and any terms, files, or metrics named in that turn.
 
 ## Context Recovery Protocol
 
@@ -262,6 +263,7 @@ Use the smallest artifact set that fully restores state:
 - **Full Single**: read `SPEC.md`, `TODO.csv`, then the `PROGRESS.md` recovery block.
 - **Epic Task**: read `EPIC.md`, `SUBTASKS.csv`, parent `PROGRESS.md`, then the current child task directory.
 - **Batch Task**: read `SPEC.md`, `TODO.csv`, `batch/BATCH.md`, `batch/workers-output.csv`, then the `PROGRESS.md` recovery block.
+Recovery restores task state, not user intent; after recovery, re-anchor on the newest user turn before answering.
 
 Every recovery message must include:
 

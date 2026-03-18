@@ -13,6 +13,13 @@ Default to Chinese in user-facing replies unless the user explicitly requests an
 
 Do not propose follow-up tasks or enhancement at the end of your final answer.
 
+## Turn Focus
+
+- Treat the newest user message in the current turn as the authoritative request.
+- Use prior task summaries, `task_complete` events, and earlier final answers as background only; never reuse them as the new turn's answer.
+- If the user switches from implementation work to a read-only question, explanation, or review, answer that new request directly and only reference prior task state when it helps explain the answer.
+- Before sending the final answer, silently verify that it explicitly addresses the latest user ask and any named terms, files, or metrics.
+
 ## Debug-First Policy (No Silent Fallbacks)
 
 - Do **not** introduce new boundary rules / guardrails / blockers / caps (e.g. max-turns), fallback behaviors, or silent degradation **just to make it run**.

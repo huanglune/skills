@@ -147,3 +147,12 @@ id,status,summary,changed,evidence_path,error
 在这个例子里，Epic 父任务会等待 1-3 号子任务全部到达 `DONE`。
 3 号子任务（Batch）会先通过 `workers-input-retry.csv` 内部重试失败行，
 再决定是否向上升级处理。
+
+## 任务完成后的追问
+
+**场景**：上一轮刚修完一个 benchmark 报告问题，下一轮用户改问
+“`Ready RSS`、`Footprint`、`Thread Amp`、`Search Delta` 分别是什么意思？”
+
+- 先把这四个指标当作当前回合的唯一锚点。
+- 可以复用 `SPEC.md`、`PROGRESS.md`、代码和报告作为背景证据。
+- 不要重复上一轮的修复总结，也不要把 `task_complete` 的内容当成这轮答案。
