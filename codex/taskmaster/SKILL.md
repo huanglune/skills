@@ -1,7 +1,7 @@
 ---
 name: taskmaster
 description: Unified task execution protocol for Codex-only work. Use for 3+ ordered file-changing steps, task tracking, autonomous execution, or long-running work that needs recoverable artifacts.
-version: 5.0.3
+version: 5.1.0
 ---
 
 # Taskmaster — v5 Task Protocol
@@ -225,6 +225,36 @@ id,task,status,acceptance_criteria,validation_command,completed_at,retry_count,n
   - `SUBTASKS.csv` for child-task state
   - `workers-output.csv` for row results
 
+## `update_plan` Mirror Protocol
+
+`update_plan` is a required mirror of the **current layer** truth file, not a
+separate planning source.
+
+- Mirror only the current layer:
+  - **Single Task**: `TODO.csv`
+  - **Epic Task**: `SUBTASKS.csv`
+  - **Batch Task**: parent `TODO.csv`
+- Never mirror `workers-output.csv` into `update_plan`; batch row state stays on disk and in `PROGRESS.md`.
+- After creating a new current-layer CSV, set the first executable row to `IN_PROGRESS`, then immediately sync `update_plan`.
+- After every current-layer status change, follow the same order:
+  1. Write the truth file.
+  2. Run `python3 codex/taskmaster/scripts/taskmaster_plan.py plan --file <TODO.csv|SUBTASKS.csv> --normalize --explanation "<同步说明>"`.
+  3. Call `update_plan` with the generated JSON payload in the same turn.
+- When promoting shape, regenerate `update_plan` from the new current-layer truth file before continuing execution.
+- Before the final answer, ensure the current-layer rows are all `DONE`, then do one final `update_plan` sync with every step marked `completed`.
+
+### Mirror Rules
+
+- CSV status mapping is fixed:
+  - `TODO` -> `pending`
+  - `IN_PROGRESS` -> `in_progress`
+  - `DONE` -> `completed`
+  - `FAILED` -> `in_progress`
+- `FAILED` must stay visible. The generated `explanation` must include the failure reason; do not silently downgrade a failed row to `TODO`.
+- A current layer may have at most one active row, where active means `IN_PROGRESS` or `FAILED`.
+- If a `FAILED` row exists, no other row in the same layer may remain active.
+- Use `--normalize` only for safe current-layer fixes: promoting the first `TODO` when there is no active row, or collapsing multiple `IN_PROGRESS` rows down to one.
+
 ### Mid-Task Shape Promotion
 
 When complexity outgrows the current shape, promote in-place:
@@ -248,10 +278,12 @@ When complexity outgrows the current shape, promote in-place:
 ## Validation Rules
 
 - Re-read the active truth file before every new step.
+- Re-sync `update_plan` from the active current-layer truth file after every status change.
 - No parent task can claim success while a child subtask or batch row still fails its merge criteria.
 - Keep retry counts explicit.
 - Keep raw fetched material under `raw/` for Full, Epic, and Batch shapes.
 - If the work is heterogeneous, use a dedicated multi-agent flow instead of forcing it into Batch.
+- If the current layer contains a `FAILED` row, treat it as the active unresolved item until it is retried, repaired, or explicitly rewritten in the truth file.
 - If the user switches from task execution to a read-only question, explanation, or review, answer that request directly instead of restating the last milestone summary.
 - Before any final answer, verify it explicitly answers the latest user request and any terms, files, or metrics named in that turn.
 
@@ -289,6 +321,7 @@ Every status update must include:
 
 - [SPEC_TEMPLATE.md](assets/SPEC_TEMPLATE.md)
 - [PROGRESS_TEMPLATE.md](assets/PROGRESS_TEMPLATE.md)
+- [taskmaster_plan.py](scripts/taskmaster_plan.py)
 - [todo_template.csv](assets/todo_template.csv)
 - [perf_todo_template.csv](assets/perf_todo_template.csv)
 - [compact_todo_template.csv](assets/compact_todo_template.csv)

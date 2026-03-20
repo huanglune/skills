@@ -14,6 +14,13 @@ description: 当需要修改项目（增删改文件）并希望将 update_plan 
 - 开始执行任何会改动项目内容的任务（新增/修改/删除文件、调整配置、修复 bug、实现功能等）
 - 任务具有多个可独立验收的小步骤，且需要显式跟踪完成状态
 
+## 与 Taskmaster 的边界
+
+- `todo-list-csv` 只管理自己的 `{任务名} TO DO list.csv`，表头固定为 `id,item,status,done_at,notes`。
+- `taskmaster` 维护的是自己的 `TODO.csv` / `SUBTASKS.csv` truth artifact，schema 为 `task/completed_at/...`，并使用 `codex/taskmaster/scripts/taskmaster_plan.py` 生成 `update_plan` payload。
+- 不要用 `scripts/todo_csv.py` 直接操作 taskmaster 的 `TODO.csv` 或 `SUBTASKS.csv`；两者状态协议相近，但表头和约束不同。
+- 当任务已经采用 taskmaster 形态时，继续使用 taskmaster 的脚本和文档同步当前层 `update_plan`。
+
 ## 工作流（CSV + update_plan 双轨同步）
 
 ### 0) 启用 update_plan 的条件

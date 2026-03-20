@@ -23,6 +23,17 @@ id,task,status,completed_at,notes
 └── raw/
 ```
 
+每次 `TODO.csv` 状态变化后，先把磁盘 truth file 写好，再同步当前层
+`update_plan`：
+
+```bash
+python3 codex/taskmaster/scripts/taskmaster_plan.py \
+  plan \
+  --file .codex-tasks/20260313-101530-auth-fix/TODO.csv \
+  --normalize \
+  --explanation "同步当前层进度"
+```
+
 ## Epic 任务
 
 **场景**：同时交付账单看板的后端、前端和文档。
@@ -115,6 +126,17 @@ id,task,task_type,status,depends_on,task_dir,acceptance_criteria,validation_comm
 3,批量翻译 40 个 locale 文件,batch,TODO,1,tasks/20260313-141900-i18n-translate,所有 locale 行都通过,test -f tasks/20260313-141900-i18n-translate/batch/workers-output.csv,,0,
 ```
 
+每次 `SUBTASKS.csv` 状态变化后，同样只镜像 Epic 当前层，而不是展开子任务
+内部步骤：
+
+```bash
+python3 codex/taskmaster/scripts/taskmaster_plan.py \
+  plan \
+  --file .codex-tasks/20260313-140000-i18n-epic/SUBTASKS.csv \
+  --normalize \
+  --explanation "同步 Epic 当前层"
+```
+
 ### Batch 子任务 TODO.csv（tasks/20260313-141900-i18n-translate/）
 
 ```csv
@@ -146,7 +168,8 @@ id,status,summary,changed,evidence_path,error
 
 在这个例子里，Epic 父任务会等待 1-3 号子任务全部到达 `DONE`。
 3 号子任务（Batch）会先通过 `workers-input-retry.csv` 内部重试失败行，
-再决定是否向上升级处理。
+再决定是否向上升级处理。`workers-output.csv` 只保留在磁盘和 `PROGRESS.md`，
+不会直接展开进 `update_plan`。
 
 ## 任务完成后的追问
 
